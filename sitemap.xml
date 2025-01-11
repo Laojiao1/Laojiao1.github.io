@@ -2,6 +2,60 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://laojiao1.github.io/2022/07/11/OJ/TraverseGraph/</loc>
+    
+    <lastmod>2025-01-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/2022/07/11/OJ/MaxSubColumn/</loc>
+    
+    <lastmod>2025-01-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/2022/07/11/OJ/ChainForwardStar/</loc>
+    
+    <lastmod>2025-01-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/2022/07/11/OJ/QuickCount/</loc>
+    
+    <lastmod>2025-01-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/2022/07/11/OJ/CantorUnfolds/</loc>
+    
+    <lastmod>2025-01-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/2025/01/11/algorithm/SqlEncryption/</loc>
+    
+    <lastmod>2025-01-11</lastmod>
+    
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
     <loc>https://laojiao1.github.io/about/index.html</loc>
     
     <lastmod>2025-01-11</lastmod>
@@ -11,7 +65,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/2025/01/10/Hungarian/</loc>
+    <loc>https://laojiao1.github.io/2025/01/10/DeepLearning/Hungarian/</loc>
     
     <lastmod>2025-01-11</lastmod>
     
@@ -29,7 +83,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/2025/01/09/kalman/</loc>
+    <loc>https://laojiao1.github.io/2025/01/09/DeepLearning/kalman/</loc>
     
     <lastmod>2025-01-10</lastmod>
     
@@ -38,7 +92,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/2025/01/09/SeoExplore/</loc>
+    <loc>https://laojiao1.github.io/2025/01/09/SEO/SeoExplore/</loc>
     
     <lastmod>2025-01-10</lastmod>
     
@@ -47,7 +101,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/2025/01/09/GoogleSearch/</loc>
+    <loc>https://laojiao1.github.io/2025/01/09/SEO/GoogleSearch/</loc>
     
     <lastmod>2025-01-10</lastmod>
     
@@ -65,7 +119,14 @@
 
   
   <url>
-    <loc>https://laojiao1.github.io/tags/SEO/</loc>
+    <loc>https://laojiao1.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/tags/%E7%AE%97%E6%B3%95/</loc>
     <lastmod>2025-01-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -78,10 +139,24 @@
     <priority>0.2</priority>
   </url>
   
+  <url>
+    <loc>https://laojiao1.github.io/tags/OJ/</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/tags/SEO/</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
 
   
   <url>
-    <loc>https://laojiao1.github.io/categories/SEO/</loc>
+    <loc>https://laojiao1.github.io/categories/Algorithm/</loc>
     <lastmod>2025-01-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -89,6 +164,20 @@
   
   <url>
     <loc>https://laojiao1.github.io/categories/DeepLearning/</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/categories/OJ/</loc>
+    <lastmod>2025-01-11</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/categories/SEO/</loc>
     <lastmod>2025-01-11</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
