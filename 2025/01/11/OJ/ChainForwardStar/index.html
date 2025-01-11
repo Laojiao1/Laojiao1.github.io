@@ -27,7 +27,6 @@
 <meta property="og:description" content="存图方式 — 链式前向星 边的存储 这种存图方式只需要开一个数组存储每个点引出的第一条边，然后存储每个点作为起点的每条边，这样就可以做到不重不漏 在链式前向星存图中，我们需要定义一个结构体： 1234struct EDGE &#123;    int next;    int to;&#125; edge[1000]; 和一个数组： 1int head[1000] 和一个变量： 1int cnt">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://laojiao1.github.io/img/OJ/image-20250111211707179.png">
-<meta property="og:image" content="c:%5CUsers%5C44174%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20220302181918965.png">
 <meta property="article:published_time" content="2025-01-11T00:50:00.000Z">
 <meta property="article:modified_time" content="2025-01-11T00:50:00.000Z">
 <meta property="article:author" content="Laojiao">
@@ -324,7 +323,7 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> cnt = <span class="hljs-number">0</span>; <span class="hljs-comment">//指针</span><br></code></pre></td></tr></table></figure>
 <p>起点用head数组存</p>
 <p><strong>举例：</strong></p>
-<p><img src="/img/OJ/image-20250111211707179.png" srcset="/img/loading.gif" lazyload alt="image-20250111211707179"></p>
+<p><img src="/img/OJ/image-20250111211707179.png" srcset="/img/loading.gif" lazyload alt=""></p>
 <p>如图：这样一个有向图的输入是：</p>
 <figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs basic"><span class="hljs-symbol">1 </span><span class="hljs-number">2</span><br><span class="hljs-symbol">1 </span><span class="hljs-number">3</span><br><span class="hljs-symbol">1 </span><span class="hljs-number">4</span><br><span class="hljs-symbol">2 </span><span class="hljs-number">3</span><br></code></pre></td></tr></table></figure>
 <h3 id="逐步分析：">逐步分析：</h3>
@@ -537,8 +536,7 @@
 <p>这个循环的结束条件是i等于0，因为最后一条边，也就是存边时第一条边，在把head值存进next时，head还没有更新过，也就是0。所以当next返回0时，就说明这些边遍历完毕了。</p>
 <h2 id="优势与特点">优势与特点</h2>
 <p>既可以存图，也可以存树，比起邻接矩阵，链式前向星的空间复杂度是O（n），大大节省了存储空间，因为按边存储省掉了很多两点无边的空间。并且在遍历的时候，那些与起点无边相连的点也不需要进行处理，可以说时间和空间都占优势，这就是被OIer们广泛使用的原因。</p>
-<h1>题目 —— 单源最短路径</h1>
-<p><img src="C:%5CUsers%5C44174%5CAppData%5CRoaming%5CTypora%5Ctypora-user-images%5Cimage-20220302181918965.png" srcset="/img/loading.gif" lazyload alt="image-20220302181918965"></p>
+<h1>实践 —— 单源最短路径</h1>
 <p><strong>代码：</strong></p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">int</span> head[<span class="hljs-number">100000</span>],cnt;<br><span class="hljs-type">long</span> <span class="hljs-type">long</span> ans[<span class="hljs-number">1000000</span>];<br><span class="hljs-type">bool</span> vis[<span class="hljs-number">1000000</span>];<br><span class="hljs-type">int</span> m,n,s;<br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">edge</span><br>&#123;<br>	<span class="hljs-type">int</span> to;<br>	<span class="hljs-type">int</span> nextt;<br>	<span class="hljs-type">int</span> wei;<br>&#125;edge[<span class="hljs-number">1000000</span>];<br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">addedge</span><span class="hljs-params">(<span class="hljs-type">int</span> x,<span class="hljs-type">int</span> y,<span class="hljs-type">int</span> z)</span></span><br><span class="hljs-function"></span>&#123;<br>	edge[++cnt].to=y;<br>	edge[cnt].wei=z;<br>	edge[cnt].nextt=head[x];<br>	head[x]=cnt;<br>&#125;<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span><br><span class="hljs-function"></span>&#123;<br>	cin&gt;&gt;m&gt;&gt;n&gt;&gt;s;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;i++)<br>	&#123;<br>		ans[i]=<span class="hljs-number">2147483647</span>;<br>	&#125;<br>	ans[s]=<span class="hljs-number">0</span>;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=n;i++)<br>	&#123;<br>		<span class="hljs-type">int</span> a,b,c;<br>		cin&gt;&gt;a&gt;&gt;b&gt;&gt;c;<br>		<span class="hljs-built_in">addedge</span>(a,b,c);<br>	&#125;<br>	<span class="hljs-type">int</span> pos=s;<br>	<span class="hljs-keyword">while</span>(vis[pos]==<span class="hljs-number">0</span>)<br>	&#123;<br>		<span class="hljs-type">long</span> <span class="hljs-type">long</span> minn=<span class="hljs-number">2147483647</span>;<br>		vis[pos]=<span class="hljs-number">1</span>;<br>		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=head[pos];i!=<span class="hljs-number">0</span>;i=edge[i].nextt)<br>		&#123;<br>			<span class="hljs-keyword">if</span>(!vis[edge[i].to]&amp;&amp;ans[edge[i].to]&gt;ans[pos]+edge[i].wei)<br>			&#123;<br>				ans[edge[i].to]=ans[pos]+edge[i].wei;<br>			&#125;<br>		&#125;<br>		<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;i++)<br>		&#123;<br>			<span class="hljs-keyword">if</span>(ans[i]&lt;minn&amp;&amp;vis[i]==<span class="hljs-number">0</span>)<br>			&#123;<br>				minn=ans[i];<br>				pos=i;<br>			&#125;<br>		&#125;<br>	&#125;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>;i&lt;=m;i++)<br>	&#123;<br>		cout&lt;&lt;ans[i]&lt;&lt;<span class="hljs-string">&#x27; &#x27;</span>;<br>	&#125;<br>&#125;<br></code></pre></td></tr></table></figure>
 
@@ -633,9 +631,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/11/OJ/CantorUnfolds/" title="【算法笔记】康托展开">
+                      <a href="/2025/01/11/algorithm/SqlEncryption/" title="【算法】AES-数据库加密算法">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">【算法笔记】康托展开</span>
+                        <span class="hidden-mobile">【算法】AES-数据库加密算法</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -643,8 +641,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/11/OJ/MaxSubColumn/" title="【常见算法问题】最大子序列和问题">
-                        <span class="hidden-mobile">【常见算法问题】最大子序列和问题</span>
+                      <a href="/2025/01/11/OJ/CantorUnfolds/" title="【算法笔记】康托展开">
+                        <span class="hidden-mobile">【算法笔记】康托展开</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
