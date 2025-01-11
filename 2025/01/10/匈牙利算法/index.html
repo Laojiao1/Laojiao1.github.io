@@ -28,7 +28,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://laojiao1.github.io/img/Hungarian/bound.png">
 <meta property="article:published_time" content="2025-01-10T11:08:45.011Z">
-<meta property="article:modified_time" content="2025-01-10T11:31:13.604Z">
+<meta property="article:modified_time" content="2025-01-11T03:33:00.574Z">
 <meta property="article:author" content="John Doe">
 <meta property="article:tag" content="DeepLearning">
 <meta name="twitter:card" content="summary_large_image">
@@ -252,7 +252,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2k 字
+          2.2k 字
         
       </span>
     
@@ -263,7 +263,7 @@
         
         
         
-          17 分钟
+          19 分钟
         
       </span>
     
@@ -406,6 +406,8 @@
 <p>至此KM算法结束。成功匹配三对，可以发现采用KM算法的匹配结果比之前采用匈牙利算法匹配的结果更加精准可靠。</p>
 </li>
 </ol>
+<h2 id="四、代码实现">四、代码实现</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 将yolo模型的检测框和卡尔曼滤波的跟踪框进行匹配</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">associate_detections_to_trackers</span>(<span class="hljs-params">detections, trackers, iou_threshold = <span class="hljs-number">0.3</span></span>):<br>    <span class="hljs-comment"># 检测框数</span><br>    <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(trackers) == <span class="hljs-number">0</span>:<br>        <span class="hljs-keyword">return</span> np.empty((<span class="hljs-number">0</span>, <span class="hljs-number">2</span>), dtype = <span class="hljs-built_in">int</span>), np.arange(<span class="hljs-built_in">len</span>(detections)), np.empty((<span class="hljs-number">0</span>, <span class="hljs-number">5</span>), dtype = <span class="hljs-built_in">int</span>)<br>    <span class="hljs-comment"># 跟踪框数</span><br>    iou_matrix = np.zeros((<span class="hljs-built_in">len</span>(detections), <span class="hljs-built_in">len</span>(trackers)), dtype = np.float32)<br>    <span class="hljs-comment"># 计算检测框和跟踪框之间的IOU</span><br>    <span class="hljs-keyword">for</span> d, det <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(detections):<br>        <span class="hljs-keyword">for</span> t, trk <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(trackers):<br>            iou_matrix[d, t] = IOU(det, trk)<br>    <span class="hljs-comment"># 匈牙利算法进行匹配</span><br>    matched_indices = linear_sum_assignment(-iou_matrix)<br>    <span class="hljs-comment"># 未匹配的检测框</span><br>    unmatched_detections = []<br>    <span class="hljs-keyword">for</span> d, det <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(detections):<br>        <span class="hljs-keyword">if</span> d <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> matched_indices[<span class="hljs-number">0</span>]:<br>            unmatched_detections.append(d)<br>    <span class="hljs-comment"># 未匹配的跟踪框</span><br>    unmatched_trackers = []<br>    <span class="hljs-keyword">for</span> t, trk <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(trackers):<br>        <span class="hljs-keyword">if</span> t <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> matched_indices[<span class="hljs-number">1</span>]:<br>            unmatched_trackers.append(t)<br>    <span class="hljs-comment"># 未匹配的跟踪框</span><br>    matches = []<br>    <span class="hljs-keyword">for</span> d, t <span class="hljs-keyword">in</span> <span class="hljs-built_in">zip</span>(matched_indices[<span class="hljs-number">0</span>], matched_indices[<span class="hljs-number">1</span>]):<br>        <span class="hljs-keyword">if</span> iou_matrix[d, t] &lt; iou_threshold:<br>            unmatched_detections.append(d)<br>            unmatched_trackers.append(t)<br>        <span class="hljs-keyword">else</span>:<br>            matches.append((d, t))<br>    <span class="hljs-comment"># 返回匹配结果</span><br>    <span class="hljs-keyword">return</span> np.array(matches), np.array(unmatched_detections), np.array(unmatched_trackers)<br></code></pre></td></tr></table></figure>
 <h2 id="参考文献">参考文献</h2>
 <ul>
 <li><a target="_blank" rel="noopener" href="https://www.cnblogs.com/ariel-dreamland/p/13522590.html">https://www.cnblogs.com/ariel-dreamland/p/13522590.html</a></li>
