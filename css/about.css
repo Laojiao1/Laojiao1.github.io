@@ -1,0 +1,46 @@
+/* note 的基础样式 */
+.note-info {
+    background-color: #f0f8ff; /* 浅蓝色背景 */
+    border-left: 5px solid #00bcd4; /* 左边添加彩色边框 */
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Arial', sans-serif;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+    max-width: 600px;
+    margin: 20px auto;
+  }
+
+  /* 段落样式 */
+  .note-info p {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #333;
+  }
+
+  /* 强调文字样式 */
+  .note-info strong {
+    font-weight: 600;
+    color: #070707; /* 强调文字颜色 */
+  }
+
+  /* 代码块样式 */
+  .note-info code {
+    background-color: #e0f7fa; /* 背景色淡蓝 */
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    color: #00796b; /* 深绿色文字 */
+  }
+
+  /* 链接样式 */
+  .note-info a {
+    color: #00796b;
+    text-decoration: none;
+    border-bottom: 1px solid #00796b; /* 下划线效果 */
+    transition: all 0.3s ease;
+  }
+
+  .note-info a:hover {
+    color: #004d40; /* 悬停时颜色变深 */
+    border-bottom: 1px solid #004d40;
+  }
