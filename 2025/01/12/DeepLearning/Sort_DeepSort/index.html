@@ -21,24 +21,22 @@
   
     <meta name="description" content="SORT &amp; DeepSORT 一、SORT 介绍 SORT（Simple Online and Realtime Tracking）是一种轻量级的多目标追踪算法，旨在在实时视频流中高效追踪多个目标。它基于两大核心技术：  卡尔曼滤波器：用于对每个目标的状态（位置和速度）进行估计和预测，以应对目标的移动。 匈牙利算法：用于解决目标匹配问题，即在每一帧图像中，确定哪些检测框与上一帧的目标进行">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Laojiao">
+<meta property="og:title" content="【深度学习】多目标追踪——SORT &amp; DeepSORT">
 <meta property="og:url" content="https://laojiao1.github.io/2025/01/12/DeepLearning/Sort_DeepSort/index.html">
 <meta property="og:site_name" content="Laojiao">
 <meta property="og:description" content="SORT &amp; DeepSORT 一、SORT 介绍 SORT（Simple Online and Realtime Tracking）是一种轻量级的多目标追踪算法，旨在在实时视频流中高效追踪多个目标。它基于两大核心技术：  卡尔曼滤波器：用于对每个目标的状态（位置和速度）进行估计和预测，以应对目标的移动。 匈牙利算法：用于解决目标匹配问题，即在每一帧图像中，确定哪些检测框与上一帧的目标进行">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png">
-<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/image-20200430001731416.png">
-<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/image-20200430003426746.png">
-<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/image-20200430004523485.png">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/bound.png">
 <meta property="article:published_time" content="2025-01-12T02:49:35.903Z">
 <meta property="article:modified_time" content="2025-01-12T02:49:35.903Z">
 <meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="DeepLearning">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/bound.png">
   
   
   
-  <title>Laojiao</title>
+  <title>【深度学习】多目标追踪——SORT &amp; DeepSORT - Laojiao</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -237,7 +235,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text=""></span>
+            <span id="subtitle" data-typed-text="【深度学习】多目标追踪——SORT &amp; DeepSORT"></span>
           
         </div>
 
@@ -260,7 +258,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.5k 字
+          2.9k 字
         
       </span>
     
@@ -271,7 +269,7 @@
         
         
         
-          22 分钟
+          25 分钟
         
       </span>
     
@@ -308,7 +306,7 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header"></h1>
+            <h1 id="seo-header">【深度学习】多目标追踪——SORT &amp; DeepSORT</h1>
             
             
               <div class="markdown-body">
@@ -324,7 +322,7 @@
 <h2 id="二、SORT-目标追踪算法">二、SORT 目标追踪算法</h2>
 <h3 id="1-SORT-初始框">1. SORT 初始框</h3>
 <p>在单目标跟踪中，初始框通常是由人工手动框定的。而在多目标跟踪中，初始框是通过目标检测器自动生成的，避免了人工初始化的过程。SORT算法基于这种目标检测机制，利用<strong>Faster R-CNN</strong>作为检测器。Faster R-CNN是一个端到端的两阶段检测框架：第一阶段负责提取图像特征并生成候选区域，第二阶段则在这些候选区域中对目标进行分类和边界框回归。</p>
-<p><img src="/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png" srcset="/img/loading.gif" lazyload alt="c1097403f1aa5f102addd3898b556d1"></p>
+<p><img src="/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png" srcset="/img/loading.gif" lazyload alt="Faster R-CNN网络"></p>
 <p>该框架的一个重要优势是，在两个阶段之间共享参数，从而提高了检测效率。此外，由于其网络架构可以灵活地替换和调整，Faster R-CNN能够快速测试不同设计，优化检测性能。通过结合Faster R-CNN，SORT能够实现高效的目标检测和准确的目标跟踪。</p>
 <h3 id="2-SORT-工作流程">2. SORT 工作流程</h3>
 <p>SORT的工作流程是：首先，使用卡尔曼滤波器对目标进行预测；然后，通过匈牙利算法进行数据关联，将预测结果与当前帧中的检测结果匹配；最后，对未匹配的目标进行处理（通常是新目标的加入或丢失目标的删除）。</p>
@@ -341,11 +339,11 @@
 </annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">s</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">˙</span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></p>
 <p>其中：</p>
 <ul>
-<li>**u 和 v：**目标中心位置的坐标（通常为 x 和 y）</li>
-<li>**s：**目标的尺度（通常是目标框的面积）</li>
-<li>**r：**目标的纵横比（aspect ratio）</li>
-<li>**<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mtext>˙</mtext><mover accent="true"><mi>u</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">u˙\dot{u}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord mathnormal">u</span><span class="mord">˙</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span> 和$ v˙\dot{v}$：**目标在 u 和 v 方向上的速度。</li>
-<li>**<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mtext>˙</mtext><mover accent="true"><mi>s</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">s˙\dot{s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord mathnormal">s</span><span class="mord">˙</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">s</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span>：**目标尺度的变化速率。</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi></mrow><annotation encoding="application/x-tex">u</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span></span></span></span>和<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>v</mi></mrow><annotation encoding="application/x-tex">v</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span></span></span>：目标中心位置的坐标（通常为 x 和 y）</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi></mrow><annotation encoding="application/x-tex">s</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span>：目标的尺度（通常是目标框的面积）</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi></mrow><annotation encoding="application/x-tex">r</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>：目标的纵横比（aspect ratio）</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>u</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">\dot{u}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>v</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">\dot{v}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span>：目标在 u 和 v 方向上的速度。</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mover accent="true"><mi>s</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">\dot{s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">s</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span>：目标尺度的变化速率。</li>
 </ul>
 <p>SORT算法具有较低的计算复杂度，适合实时追踪，但由于它仅基于目标的运动信息（位置和速度），对目标间的遮挡、外观变化、长时间丢失等情况的鲁棒性较差。</p>
 <p>为了提升跟踪的精度和鲁棒性，<strong>DeepSORT</strong> 应运而生——通过结合深度学习特征和传统的运动预测模型，DeepSORT不仅能够有效解决目标间的相似性判别问题，还能显著增强目标在长时间遮挡或交叉运动中的追踪稳定性。</p>
@@ -405,7 +403,7 @@
 <li>
 <p><strong>门限限制（Gate Matrix）</strong>：</p>
 <ul>
-<li>引入一个 <strong>门限（gating_threshold）</strong> 来过滤掉不可能的匹配结果，生成 <strong>Gate Matrix</strong>，将代价矩阵中超过最大距离**（max_distance）**的匹配关系剔除，减少误匹配</li>
+<li>引入一个 <strong>门限（gating_threshold）</strong> 来过滤掉不可能的匹配结果，生成 <strong>Gate Matrix</strong>，将代价矩阵中超过最大距离（<strong>max_distance</strong>）的匹配关系剔除，减少误匹配</li>
 </ul>
 </li>
 <li>
@@ -418,7 +416,7 @@
 <p><strong>级联匹配</strong>：</p>
 <ul>
 <li>以目标轨迹的 <strong>age（年龄）</strong> 为顺序，优先匹配 <strong>missing age = 0</strong>（即刚更新过的轨迹）对应的检测框，确保更新最频繁的目标优先匹配</li>
-<li>如果有轨迹未匹配成功，其 <strong>missing age</strong> 加1，继续尝试匹配，直到达到最大允许丢失帧数**（max_age）**</li>
+<li>如果有轨迹未匹配成功，其 <strong>missing age</strong> 加1，继续尝试匹配，直到达到最大允许丢失帧数（<strong>max_age</strong>）</li>
 <li>重复该过程直至所有检测和轨迹匹配完成</li>
 </ul>
 </li>
@@ -431,7 +429,9 @@
 </ol>
 <p>流程图如下：</p>
 <p><img src="/img/DeepLearning/Sort_DeepSort/image-20200430004523485.png" srcset="/img/loading.gif" lazyload alt="级联匹配"></p>
-<h2 id="四、总结">四、总结</h2>
+<h2 id="四、代码实现">四、代码实现</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># SORT多目标追踪</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Sort</span>(<span class="hljs-title class_ inherited__">object</span>):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, max_age = <span class="hljs-number">1</span>, min_hits = <span class="hljs-number">3</span></span>):<br>        <span class="hljs-comment"># 最大跟踪次数</span><br>        <span class="hljs-variable language_">self</span>.max_age = max_age<br>        <span class="hljs-comment"># 最小命中次数</span><br>        <span class="hljs-variable language_">self</span>.min_hits = min_hits<br>        <span class="hljs-comment"># 跟踪框</span><br>        <span class="hljs-variable language_">self</span>.trackers = []<br>        <span class="hljs-comment"># 帧数</span><br>        <span class="hljs-variable language_">self</span>.frame_count = <span class="hljs-number">0</span><br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">update</span>(<span class="hljs-params">self, dets</span>):<br>        <span class="hljs-comment"># 记录状态异常的跟踪器索引</span><br>        <span class="hljs-variable language_">self</span>.frame_count = <span class="hljs-number">1</span><br>        <span class="hljs-comment"># 根据当前所有的卡尔曼跟踪器个数（即上一帧中跟踪的目标个数）创建二维数组</span><br>        <span class="hljs-comment"># 存储器跟踪预测treks</span><br>        treks = np.zeros((<span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.trackers), <span class="hljs-number">5</span>))<br>        to_del = [] <span class="hljs-comment"># 要删除的目标框</span><br>        ret = [] <span class="hljs-comment"># 存储要返回的追踪目标框</span><br>        <span class="hljs-comment"># 循环遍历卡尔曼滤波器t产生的对应目标的跟踪框</span><br>        <span class="hljs-keyword">for</span> t, trk <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(treks):<br>            <span class="hljs-comment"># 更新跟踪器的状态</span><br>            pos = <span class="hljs-variable language_">self</span>.trackers[t].predict()[<span class="hljs-number">0</span>]<br>            trk[:] = [pos[<span class="hljs-number">0</span>], pos[<span class="hljs-number">1</span>], pos[<span class="hljs-number">2</span>], pos[<span class="hljs-number">3</span>], <span class="hljs-number">0</span>]<br>            <span class="hljs-comment"># 若跟踪器的跟踪次数大于最大跟踪次数，则删除</span><br>            <span class="hljs-keyword">if</span> np.<span class="hljs-built_in">any</span>(np.isnan(pos)):<br>                to_del.append(t)<br>        <span class="hljs-comment"># 删除跟踪器</span><br>        treks = np.ma.compress_rows(np.ma.masked_invalid(treks))<br>        <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> <span class="hljs-built_in">reversed</span>(to_del):<br>            <span class="hljs-variable language_">self</span>.trackers.pop(t)<br>        <span class="hljs-comment"># 检测框数</span><br>        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(dets, treks)<br><br>        <span class="hljs-comment"># 更新跟踪器状态</span><br>        <span class="hljs-keyword">for</span> t, trk <span class="hljs-keyword">in</span> <span class="hljs-built_in">enumerate</span>(<span class="hljs-variable language_">self</span>.trackers):<br>            <span class="hljs-keyword">if</span> t <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> unmatched_trks:<br>                d = matched[np.where(matched[:, <span class="hljs-number">1</span>] == t)[<span class="hljs-number">0</span>], <span class="hljs-number">0</span>]<br>                trk.update(dets[d, :][<span class="hljs-number">0</span>])<br><br>        <span class="hljs-comment"># 新的跟踪器</span><br>        <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> unmatched_dets:<br>            trk = KalmanBoxTracker(dets[i, :])<br>            <span class="hljs-variable language_">self</span>.trackers.append(trk)<br><br>        i = <span class="hljs-built_in">len</span>(<span class="hljs-variable language_">self</span>.trackers)<br>        <span class="hljs-keyword">for</span> trk <span class="hljs-keyword">in</span> <span class="hljs-built_in">reversed</span>(<span class="hljs-variable language_">self</span>.trackers):<br>            d = trk.get_state()[<span class="hljs-number">0</span>]<br>            <span class="hljs-keyword">if</span> (trk.time_since_update &lt; <span class="hljs-number">1</span>) <span class="hljs-keyword">and</span> (trk.hit_streak &gt;= <span class="hljs-variable language_">self</span>.min_hits <span class="hljs-keyword">or</span> <span class="hljs-variable language_">self</span>.frame_count &lt;= <span class="hljs-variable language_">self</span>.min_hits):<br>                ret.append(np.concatenate((d, [trk.<span class="hljs-built_in">id</span>+<span class="hljs-number">1</span>])).reshape(<span class="hljs-number">1</span>, -<span class="hljs-number">1</span>))<br>            i -= <span class="hljs-number">1</span><br>            <span class="hljs-comment"># 跟踪失败或离开画面的目标从卡尔曼跟踪器中删除</span><br>            <span class="hljs-keyword">if</span> trk.time_since_update &gt; <span class="hljs-variable language_">self</span>.max_age:<br>                <span class="hljs-variable language_">self</span>.trackers.pop(i)<br><br>        <span class="hljs-comment"># 返回当前画面中所有目标的box与id</span><br>        <span class="hljs-keyword">if</span> <span class="hljs-built_in">len</span>(ret) &gt; <span class="hljs-number">0</span>:<br>            <span class="hljs-keyword">return</span> np.concatenate(ret)<br>        <span class="hljs-keyword">return</span> np.empty((<span class="hljs-number">0</span>, <span class="hljs-number">5</span>))<br></code></pre></td></tr></table></figure>
+<h2 id="五、总结">五、总结</h2>
 <h3 id="1-SORT算法">1. <strong>SORT算法</strong></h3>
 <p>SORT（Simple Online and Realtime Tracking）是一种轻量级且高效的多目标跟踪算法，它依赖于强大的目标检测器（如Faster R-CNN）提供检测框，通过结合 <strong>卡尔曼滤波</strong> 和 <strong>匈牙利算法</strong> 实现目标的实时跟踪。</p>
 <ul>
@@ -463,6 +463,34 @@
             <div>
               <div class="post-metas my-3">
   
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/DeepLearning/" class="category-chain-item">DeepLearning</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/DeepLearning/" class="print-no-link">#DeepLearning</a>
+      
+    </div>
   
 </div>
 
@@ -472,7 +500,7 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div></div>
+      <div>【深度学习】多目标追踪——SORT &amp; DeepSORT</div>
       <div>https://laojiao1.github.io/2025/01/12/DeepLearning/Sort_DeepSort/</div>
     </div>
     <div class="license-meta">
