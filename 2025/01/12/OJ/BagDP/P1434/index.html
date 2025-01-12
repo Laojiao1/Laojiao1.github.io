@@ -19,23 +19,24 @@
   <meta name="author" content="Laojiao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="图的遍历(反向建边+dfs) https:&#x2F;&#x2F;www.luogu.com.cn&#x2F;problem&#x2F;P3916 按题目来每次考虑每个点可以到达点编号最大的点，不如考虑较大的点可以反向到达哪些点 循环从N到1，则每个点i能访问到的结点的A值都是i 每个点访问一次，这个A值就是最优的，因为之后如果再访问到这个结点那么答案肯定没当前大了 12345678910111213141516171819202122">
+    <meta name="description" content="滑雪（记忆化搜索） 题目链接 本题关键字：记忆化搜索。 首先，这题为什么会想到记忆化？(知道的人直接跳过) 在dfs每种情况是，可能这个点之前已经搜过了，没必要再去搜索了，因此不如存储记住，就没必要再去dfs了。  本题的主要思路： 1.先去想dfs怎么做： 这题每个点出发有可能，所以我们每个点都要开始dfs，最后取他们的最大值。 dfs部分和类似的迷宫差不多,用两个数组表示4个方向： 12dx[">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【洛谷】P3916 —— 反向建边 + dfs">
-<meta property="og:url" content="https://laojiao1.github.io/2025/01/11/OJ/TraverseGraph/index.html">
+<meta property="og:title" content="【洛谷】滑雪——记忆化搜索">
+<meta property="og:url" content="https://laojiao1.github.io/2025/01/12/OJ/BagDP/P1434/index.html">
 <meta property="og:site_name" content="Laojiao">
-<meta property="og:description" content="图的遍历(反向建边+dfs) https:&#x2F;&#x2F;www.luogu.com.cn&#x2F;problem&#x2F;P3916 按题目来每次考虑每个点可以到达点编号最大的点，不如考虑较大的点可以反向到达哪些点 循环从N到1，则每个点i能访问到的结点的A值都是i 每个点访问一次，这个A值就是最优的，因为之后如果再访问到这个结点那么答案肯定没当前大了 12345678910111213141516171819202122">
+<meta property="og:description" content="滑雪（记忆化搜索） 题目链接 本题关键字：记忆化搜索。 首先，这题为什么会想到记忆化？(知道的人直接跳过) 在dfs每种情况是，可能这个点之前已经搜过了，没必要再去搜索了，因此不如存储记住，就没必要再去dfs了。  本题的主要思路： 1.先去想dfs怎么做： 这题每个点出发有可能，所以我们每个点都要开始dfs，最后取他们的最大值。 dfs部分和类似的迷宫差不多,用两个数组表示4个方向： 12dx[">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-01-11T00:50:00.000Z">
-<meta property="article:modified_time" content="2025-01-11T00:50:00.000Z">
+<meta property="article:published_time" content="2025-01-12T13:08:00.000Z">
+<meta property="article:modified_time" content="2025-01-12T13:08:00.000Z">
 <meta property="article:author" content="Laojiao">
 <meta property="article:tag" content="OJ">
 <meta property="article:tag" content="算法">
+<meta property="article:tag" content="洛谷">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>【洛谷】P3916 —— 反向建边 + dfs - Laojiao</title>
+  <title>【洛谷】滑雪——记忆化搜索 - Laojiao</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -234,7 +235,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="【洛谷】P3916 —— 反向建边 + dfs"></span>
+            <span id="subtitle" data-typed-text="【洛谷】滑雪——记忆化搜索"></span>
           
         </div>
 
@@ -245,8 +246,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-01-11 08:50" pubdate>
-          2025年1月11日 早上
+        <time datetime="2025-01-12 21:08" pubdate>
+          2025年1月12日 晚上
         </time>
       </span>
     
@@ -257,7 +258,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          238 字
+          796 字
         
       </span>
     
@@ -268,7 +269,7 @@
         
         
         
-          2 分钟
+          7 分钟
         
       </span>
     
@@ -305,17 +306,44 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">【洛谷】P3916 —— 反向建边 + dfs</h1>
+            <h1 id="seo-header">【洛谷】滑雪——记忆化搜索</h1>
             
             
               <div class="markdown-body">
                 
-                <h1>图的遍历(反向建边+dfs)</h1>
-<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P3916">https://www.luogu.com.cn/problem/P3916</a></p>
-<p>按题目来每次考虑每个点可以到达点编号最大的点，不如考虑较大的点可以反向到达哪些点</p>
-<p>循环从N到1，则每个点i能访问到的结点的A值都是i</p>
-<p>每个点访问一次，这个A值就是最优的，因为之后如果再访问到这个结点那么答案肯定没当前大了</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXL 100010</span><br><br><span class="hljs-type">int</span> N, M, A[MAXL];<br>vector&lt;<span class="hljs-type">int</span>&gt; G[MAXL]; <span class="hljs-comment">//vector存图 </span><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> d)</span> </span>&#123;<br>	<span class="hljs-keyword">if</span>(A[x]) <span class="hljs-keyword">return</span>; <span class="hljs-comment">//访问过 </span><br>	A[x] = d;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;G[x].<span class="hljs-built_in">size</span>(); i++)<br>		<span class="hljs-built_in">dfs</span>(G[x][i], d);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>	<span class="hljs-type">int</span> u, v;<br>	<span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d%d&quot;</span>, &amp;N, &amp;M);<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=M; i++) &#123;<br>		<span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d%d&quot;</span>, &amp;u, &amp;v);<br>		G[v].<span class="hljs-built_in">push_back</span>(u); <span class="hljs-comment">//反向建边 </span><br>	&#125;<br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=N; i; i--) <span class="hljs-built_in">dfs</span>(i, i); <br>	<span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=N; i++) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, A[i]);<br>	<span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br>	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+                <h1>滑雪（记忆化搜索）</h1>
+<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1434">题目链接</a></p>
+<h3 id="本题关键字：记忆化搜索。">本题关键字：记忆化搜索。</h3>
+<p><strong>首先，这题为什么会想到记忆化？(知道的人直接跳过)</strong></p>
+<p>在dfs每种情况是，可能这个点之前已经搜过了，没必要再去搜索了，因此不如存储记住，就没必要再去dfs了。</p>
+<hr>
+<p>本题的主要思路：</p>
+<p><strong>1.先去想dfs怎么做：</strong></p>
+<p>这题每个点出发有可能，所以我们每个点都要开始dfs，最后取他们的最大值。</p>
+<p>dfs部分和类似的迷宫差不多,用两个数组表示4个方向：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">dx</span>[<span class="hljs-number">4</span>]=&#123;<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,-<span class="hljs-number">1</span>&#125;;<br><span class="hljs-attribute">dy</span>[<span class="hljs-number">4</span>]=&#123;<span class="hljs-number">1</span>,-<span class="hljs-number">1</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>&#125;;<br></code></pre></td></tr></table></figure>
+<p>改变方向直接xx=x+dx[i] , yy=y+dy[i]</p>
+<p>接下来判断这个方向是否在地图范围内，即</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dts">if(xx&gt;<span class="hljs-number">0</span>&amp;<span class="hljs-variable">&amp;xx</span><span class="hljs-params">&lt;=R&amp;<span class="hljs-variable">&amp;yy</span>&gt;</span><span class="hljs-number">0</span>&amp;<span class="hljs-variable">&amp;yy</span><span class="hljs-params">&lt;=C)</span><br></code></pre></td></tr></table></figure>
+<p>当然还要判断这个点是否能滑到，也就是高度要前一个低：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">if(<span class="hljs-selector-tag">a</span><span class="hljs-selector-attr">[xx]</span><span class="hljs-selector-attr">[yy]</span>&lt;<span class="hljs-selector-tag">a</span><span class="hljs-selector-attr">[x]</span><span class="hljs-selector-attr">[y]</span>)//<span class="hljs-selector-tag">a</span>为高度<br></code></pre></td></tr></table></figure>
+<p>很明显，因为低的不可能滑向高的，所以我们不需要再开一个数组去记录这个点是否走过。</p>
+<p>接下来，就要往四个方向搜索，取四个方向中距离最长的，然后+1，这就是这个点的结果了。</p>
+<p><strong>2.记忆化搜索怎么写</strong></p>
+<p>很显然，直接dfs会TLE。那么就需要记忆化来优化。</p>
+<p>用s[i][j]表示从(i,j)点出发能走的最长距离。</p>
+<p>每次搜索一次记忆一次即可。</p>
+<p>下面给刚接触不怎么明白的人举例：(已经理解的人跳过)</p>
+<p>由于样例不好讲我自己举例子：</p>
+<figure class="highlight basic"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs basic"><span class="hljs-symbol">3 </span><span class="hljs-number">3</span> <br><span class="hljs-symbol">1 </span><span class="hljs-number">1</span> <span class="hljs-number">3</span><br><span class="hljs-symbol">2 </span><span class="hljs-number">3</span> <span class="hljs-number">4</span><br><span class="hljs-symbol">1 </span><span class="hljs-number">1</span> <span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<p>先去找(1,1)的最长距离，很明显为1</p>
+<p>接着找(1,2)的最长距离，很明显为1</p>
+<p>接着找(1,3)的最长距离，为2((1,3)-&gt;(1,2))</p>
+<p>然后找(2,1)的最长距离，为2((2,1)-&gt;(1,1))</p>
+<p>然后是(2,2)的最长距离，如果没有记忆化，那么搜索过程为：(2,2)-&gt;(2,1)-&gt;(1,1)</p>
+<p>但是（2,1）之前已经搜过了，再去搜就是浪费时间，之前搜索已经知道(2,1)的值为2，那么搜索过程就是缩短为：(2,2)-&gt;(2,1),即为3</p>
+<p><strong>附上代码：</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">const</span> <span class="hljs-type">int</span> maxn = <span class="hljs-number">101</span>;<br><span class="hljs-type">int</span> n, m;<br><span class="hljs-type">int</span> ans = <span class="hljs-number">0</span>;<br><span class="hljs-type">int</span> a[maxn][maxn], s[maxn][maxn];<br><span class="hljs-type">int</span> dx[<span class="hljs-number">4</span>] = &#123;<span class="hljs-number">0</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">-1</span>&#125;;<br><span class="hljs-type">int</span> dy[<span class="hljs-number">4</span>] = &#123;<span class="hljs-number">1</span>, <span class="hljs-number">-1</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> y)</span> </span>&#123;<br>    <span class="hljs-keyword">if</span>(s[x][y]) <span class="hljs-keyword">return</span> s[x][y];  <span class="hljs-comment">//记忆化搜索</span><br>    s[x][y] = <span class="hljs-number">1</span>; <span class="hljs-comment">//题目答案是有包含这个点的</span><br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">4</span>; i++) &#123;<br>        <span class="hljs-type">int</span> xx = dx[i] + x;<br>        <span class="hljs-type">int</span> yy = dy[i] + y; <span class="hljs-comment">//四个方向</span><br>        <span class="hljs-keyword">if</span>(xx &gt; <span class="hljs-number">0</span> &amp;&amp; yy &gt; <span class="hljs-number">0</span> &amp;&amp; xx &lt;= n &amp;&amp; yy &lt;= m &amp;&amp; a[x][y] &gt; a[xx][yy]) &#123;<br>            <span class="hljs-built_in">dfs</span>(xx, yy);<br>            s[x][y] = <span class="hljs-built_in">max</span>(s[x][y], s[xx][yy]<span class="hljs-number">+1</span>);<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> s[x][y];<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    cin &gt;&gt; n &gt;&gt; m;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++) &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; j++) &#123;<br>            cin &gt;&gt; a[i][j];<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++) &#123; <span class="hljs-comment">//找从每个出发的最长距离</span><br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> j = <span class="hljs-number">1</span>; j &lt;= m; j++) &#123;<br>            ans = <span class="hljs-built_in">max</span>(ans, <span class="hljs-built_in">dfs</span>(i, j)); <span class="hljs-comment">//取最大值</span><br>        &#125;<br>    &#125;<br>    cout &lt;&lt; ans &lt;&lt; endl;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
 
                 
               </div>
@@ -337,6 +365,13 @@
   <a href="/categories/OJ/" class="category-chain-item">OJ</a>
   
   
+    <span>></span>
+    
+  <a href="/categories/OJ/BagDP/" class="category-chain-item">BagDP</a>
+  
+  
+
+  
 
       </span>
     
@@ -353,6 +388,8 @@
       
         <a href="/tags/%E7%AE%97%E6%B3%95/" class="print-no-link">#算法</a>
       
+        <a href="/tags/%E6%B4%9B%E8%B0%B7/" class="print-no-link">#洛谷</a>
+      
     </div>
   
 </div>
@@ -363,8 +400,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>【洛谷】P3916 —— 反向建边 + dfs</div>
-      <div>https://laojiao1.github.io/2025/01/11/OJ/TraverseGraph/</div>
+      <div>【洛谷】滑雪——记忆化搜索</div>
+      <div>https://laojiao1.github.io/2025/01/12/OJ/BagDP/P1434/</div>
     </div>
     <div class="license-meta">
       
@@ -376,7 +413,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年1月11日</div>
+          <div>2025年1月12日</div>
         </div>
       
       
@@ -408,9 +445,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/11/OJ/ChainForwardStar/" title="【算法笔记】存图方式 — 链式前向星">
+                      <a href="/2025/01/12/OJ/BagDP/P1082/" title="【洛谷】5倍经验日——01背包变形">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">【算法笔记】存图方式 — 链式前向星</span>
+                        <span class="hidden-mobile">【洛谷】5倍经验日——01背包变形</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -418,8 +455,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/11/OJ/QuickCount/" title="【算法笔记】快速幂">
-                        <span class="hidden-mobile">【算法笔记】快速幂</span>
+                      <a href="/2025/01/12/OJ/BagDP/P1833/" title="【洛谷】樱花——混合背包">
+                        <span class="hidden-mobile">【洛谷】樱花——混合背包</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
