@@ -47,7 +47,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/2025/01/11/OJ/TraverseGraph/</loc>
+    <loc>https://laojiao1.github.io/2025/01/11/OJ/QuickCount/</loc>
     
     <lastmod>2025-01-11</lastmod>
     
@@ -56,7 +56,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/2025/01/11/OJ/QuickCount/</loc>
+    <loc>https://laojiao1.github.io/2025/01/11/OJ/TraverseGraph/</loc>
     
     <lastmod>2025-01-11</lastmod>
     
@@ -149,7 +149,14 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
+    <loc>https://laojiao1.github.io/tags/OpenCV/</loc>
+    <lastmod>2025-01-12</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  
+  <url>
+    <loc>https://laojiao1.github.io/tags/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/</loc>
     <lastmod>2025-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -163,7 +170,7 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/tags/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/</loc>
+    <loc>https://laojiao1.github.io/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
     <lastmod>2025-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
@@ -186,14 +193,14 @@
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/categories/Algorithm/</loc>
+    <loc>https://laojiao1.github.io/categories/SEO/</loc>
     <lastmod>2025-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>
   </url>
   
   <url>
-    <loc>https://laojiao1.github.io/categories/SEO/</loc>
+    <loc>https://laojiao1.github.io/categories/Algorithm/</loc>
     <lastmod>2025-01-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.2</priority>

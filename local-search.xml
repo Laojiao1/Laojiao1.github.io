@@ -4,7 +4,7 @@
   
   
   <entry>
-    <title>【深度学习】多目标追踪——SORT &amp; DeepSORT</title>
+    <title>【计算机视觉】多目标追踪——SORT &amp; DeepSORT</title>
     <link href="/2025/01/12/DeepLearning/Sort_DeepSort/"/>
     <url>/2025/01/12/DeepLearning/Sort_DeepSort/</url>
     
@@ -21,6 +21,8 @@
     <tags>
       
       <tag>DeepLearning</tag>
+      
+      <tag>OpenCV</tag>
       
       <tag>目标检测</tag>
       
@@ -139,33 +141,6 @@
   
   
   <entry>
-    <title>【洛谷】P3916 —— 反向建边 + dfs</title>
-    <link href="/2025/01/11/OJ/TraverseGraph/"/>
-    <url>/2025/01/11/OJ/TraverseGraph/</url>
-    
-    <content type="html"><![CDATA[<h1>图的遍历(反向建边+dfs)</h1><p><a href="https://www.luogu.com.cn/problem/P3916">https://www.luogu.com.cn/problem/P3916</a></p><p>按题目来每次考虑每个点可以到达点编号最大的点，不如考虑较大的点可以反向到达哪些点</p><p>循环从N到1，则每个点i能访问到的结点的A值都是i</p><p>每个点访问一次，这个A值就是最优的，因为之后如果再访问到这个结点那么答案肯定没当前大了</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXL 100010</span><br><br><span class="hljs-type">int</span> N, M, A[MAXL];<br>vector&lt;<span class="hljs-type">int</span>&gt; G[MAXL]; <span class="hljs-comment">//vector存图 </span><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> d)</span> </span>&#123;<br><span class="hljs-keyword">if</span>(A[x]) <span class="hljs-keyword">return</span>; <span class="hljs-comment">//访问过 </span><br>A[x] = d;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;G[x].<span class="hljs-built_in">size</span>(); i++)<br><span class="hljs-built_in">dfs</span>(G[x][i], d);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br><span class="hljs-type">int</span> u, v;<br><span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d%d&quot;</span>, &amp;N, &amp;M);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=M; i++) &#123;<br><span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d%d&quot;</span>, &amp;u, &amp;v);<br>G[v].<span class="hljs-built_in">push_back</span>(u); <span class="hljs-comment">//反向建边 </span><br>&#125;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=N; i; i--) <span class="hljs-built_in">dfs</span>(i, i); <br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=N; i++) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, A[i]);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
-    
-    
-    <categories>
-      
-      <category>OJ</category>
-      
-    </categories>
-    
-    
-    <tags>
-      
-      <tag>OJ</tag>
-      
-      <tag>算法</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>【算法笔记】快速幂</title>
     <link href="/2025/01/11/OJ/QuickCount/"/>
     <url>/2025/01/11/OJ/QuickCount/</url>
@@ -193,7 +168,34 @@
   
   
   <entry>
-    <title>【深度学习】多目标追踪——匈牙利算法与KM算法</title>
+    <title>【洛谷】P3916 —— 反向建边 + dfs</title>
+    <link href="/2025/01/11/OJ/TraverseGraph/"/>
+    <url>/2025/01/11/OJ/TraverseGraph/</url>
+    
+    <content type="html"><![CDATA[<h1>图的遍历(反向建边+dfs)</h1><p><a href="https://www.luogu.com.cn/problem/P3916">https://www.luogu.com.cn/problem/P3916</a></p><p>按题目来每次考虑每个点可以到达点编号最大的点，不如考虑较大的点可以反向到达哪些点</p><p>循环从N到1，则每个点i能访问到的结点的A值都是i</p><p>每个点访问一次，这个A值就是最优的，因为之后如果再访问到这个结点那么答案肯定没当前大了</p><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstdio&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;vector&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-meta">#<span class="hljs-keyword">define</span> MAXL 100010</span><br><br><span class="hljs-type">int</span> N, M, A[MAXL];<br>vector&lt;<span class="hljs-type">int</span>&gt; G[MAXL]; <span class="hljs-comment">//vector存图 </span><br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">dfs</span><span class="hljs-params">(<span class="hljs-type">int</span> x, <span class="hljs-type">int</span> d)</span> </span>&#123;<br><span class="hljs-keyword">if</span>(A[x]) <span class="hljs-keyword">return</span>; <span class="hljs-comment">//访问过 </span><br>A[x] = d;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>; i&lt;G[x].<span class="hljs-built_in">size</span>(); i++)<br><span class="hljs-built_in">dfs</span>(G[x][i], d);<br>&#125;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br><span class="hljs-type">int</span> u, v;<br><span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d%d&quot;</span>, &amp;N, &amp;M);<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=M; i++) &#123;<br><span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d%d&quot;</span>, &amp;u, &amp;v);<br>G[v].<span class="hljs-built_in">push_back</span>(u); <span class="hljs-comment">//反向建边 </span><br>&#125;<br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=N; i; i--) <span class="hljs-built_in">dfs</span>(i, i); <br><span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i=<span class="hljs-number">1</span>; i&lt;=N; i++) <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%d &quot;</span>, A[i]);<br><span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;\n&quot;</span>);<br><span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>]]></content>
+    
+    
+    <categories>
+      
+      <category>OJ</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>OJ</tag>
+      
+      <tag>算法</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>【计算机视觉】多目标追踪——匈牙利算法与KM算法</title>
     <link href="/2025/01/10/DeepLearning/Hungarian/"/>
     <url>/2025/01/10/DeepLearning/Hungarian/</url>
     
@@ -210,6 +212,8 @@
     <tags>
       
       <tag>DeepLearning</tag>
+      
+      <tag>OpenCV</tag>
       
       <tag>目标检测</tag>
       
@@ -270,7 +274,7 @@
   
   
   <entry>
-    <title>【深度学习】目标追踪检测——卡尔曼滤波</title>
+    <title>【计算机视觉】目标追踪检测——卡尔曼滤波</title>
     <link href="/2025/01/09/DeepLearning/kalman/"/>
     <url>/2025/01/09/DeepLearning/kalman/</url>
     
@@ -287,6 +291,8 @@
     <tags>
       
       <tag>DeepLearning</tag>
+      
+      <tag>OpenCV</tag>
       
       <tag>目标检测</tag>
       
