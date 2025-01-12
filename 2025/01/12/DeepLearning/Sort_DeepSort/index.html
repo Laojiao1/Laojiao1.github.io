@@ -1,0 +1,807 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="SORT &amp; DeepSORT 一、SORT 介绍 SORT（Simple Online and Realtime Tracking）是一种轻量级的多目标追踪算法，旨在在实时视频流中高效追踪多个目标。它基于两大核心技术：  卡尔曼滤波器：用于对每个目标的状态（位置和速度）进行估计和预测，以应对目标的移动。 匈牙利算法：用于解决目标匹配问题，即在每一帧图像中，确定哪些检测框与上一帧的目标进行">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Laojiao">
+<meta property="og:url" content="https://laojiao1.github.io/2025/01/12/DeepLearning/Sort_DeepSort/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="SORT &amp; DeepSORT 一、SORT 介绍 SORT（Simple Online and Realtime Tracking）是一种轻量级的多目标追踪算法，旨在在实时视频流中高效追踪多个目标。它基于两大核心技术：  卡尔曼滤波器：用于对每个目标的状态（位置和速度）进行估计和预测，以应对目标的移动。 匈牙利算法：用于解决目标匹配问题，即在每一帧图像中，确定哪些检测框与上一帧的目标进行">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/image-20200430001731416.png">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/image-20200430003426746.png">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/image-20200430004523485.png">
+<meta property="article:published_time" content="2025-01-12T02:49:35.903Z">
+<meta property="article:modified_time" content="2025-01-12T02:49:35.903Z">
+<meta property="article:author" content="Laojiao">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png">
+  
+  
+  
+  <title>Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text=""></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-12 10:49" pubdate>
+          2025年1月12日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header"></h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>SORT &amp; DeepSORT</h1>
+<h2 id="一、SORT-介绍">一、SORT 介绍</h2>
+<p>SORT（Simple Online and Realtime Tracking）是一种轻量级的多目标追踪算法，旨在在实时视频流中高效追踪多个目标。它基于两大核心技术：</p>
+<ol>
+<li><a href="https://laojiao1.github.io/2025/01/09/DeepLearning/kalman/">卡尔曼滤波器</a>：用于对每个目标的状态（位置和速度）进行估计和预测，以应对目标的移动。</li>
+<li><a href="https://laojiao1.github.io/2025/01/10/DeepLearning/Hungarian/">匈牙利算法</a>：用于解决目标匹配问题，即在每一帧图像中，确定哪些检测框与上一帧的目标进行匹配。</li>
+</ol>
+<p>SORT 算法的核心思想是通过结合<strong>目标检测</strong>和<strong>运动预测</strong>来实现<strong>多目标追踪</strong>。首先，利用目标检测器（如Faster R-CNN）在每一帧图像中检测目标的边界框。接下来，通过卡尔曼滤波器对目标的运动进行建模和预测。卡尔曼滤波器结合当前目标状态和运动模型，预测目标在下一帧中的位置和速度。为了在不同帧之间建立目标的关联，SORT引入了基于<strong>匈牙利算法</strong>的数据关联方法。该方法通过最小化代价（如IOU距离）来匹配当前帧中的目标与先前帧中的已跟踪目标，从而确保每个目标的身份和轨迹得到正确追踪。</p>
+<h2 id="二、SORT-目标追踪算法">二、SORT 目标追踪算法</h2>
+<h3 id="1-SORT-初始框">1. SORT 初始框</h3>
+<p>在单目标跟踪中，初始框通常是由人工手动框定的。而在多目标跟踪中，初始框是通过目标检测器自动生成的，避免了人工初始化的过程。SORT算法基于这种目标检测机制，利用<strong>Faster R-CNN</strong>作为检测器。Faster R-CNN是一个端到端的两阶段检测框架：第一阶段负责提取图像特征并生成候选区域，第二阶段则在这些候选区域中对目标进行分类和边界框回归。</p>
+<p><img src="/img/DeepLearning/Sort_DeepSort/c1097403f1aa5f102addd3898b556d1.png" srcset="/img/loading.gif" lazyload alt="c1097403f1aa5f102addd3898b556d1"></p>
+<p>该框架的一个重要优势是，在两个阶段之间共享参数，从而提高了检测效率。此外，由于其网络架构可以灵活地替换和调整，Faster R-CNN能够快速测试不同设计，优化检测性能。通过结合Faster R-CNN，SORT能够实现高效的目标检测和准确的目标跟踪。</p>
+<h3 id="2-SORT-工作流程">2. SORT 工作流程</h3>
+<p>SORT的工作流程是：首先，使用卡尔曼滤波器对目标进行预测；然后，通过匈牙利算法进行数据关联，将预测结果与当前帧中的检测结果匹配；最后，对未匹配的目标进行处理（通常是新目标的加入或丢失目标的删除）。</p>
+<p><strong>关键步骤：<strong>轨迹卡尔曼滤波</strong>预测</strong>→ 使用<strong>匈牙利算法</strong>将预测后的tracks和当前帧中的detecions进行匹配（<strong>IOU匹配</strong>） → 卡尔曼滤波<strong>更新</strong></p>
+<p><img src="/img/DeepLearning/Sort_DeepSort/image-20200430001731416.png" srcset="/img/loading.gif" lazyload alt="SORT工作流程"></p>
+<ul>
+<li><strong>卡尔曼滤波</strong>包括两个步骤：<strong>预测</strong>和<strong>更新</strong>。在SORT中，通过引入线性速度模型，卡尔曼滤波用于对目标的位置进行<strong>预测</strong>，即先估计目标的未来位置，然后再进行目标匹配。运动模型提供了目标位置的预测信息，用于帮助追踪过程中更准确地估计物体的运动轨迹。</li>
+<li><strong>匈牙利算法</strong>用于解决<strong>分配问题</strong>，其核心是通过计算每对目标框之间的<strong>IOU</strong>（Intersection over Union）值来构建一个代价矩阵。IOU越大，表示两个目标框之间的重合度越高，匹配的可能性越大。当IOU低于一个设定阈值（通常为0.3）时，认为这两个框不属于同一个目标，从而避免错误匹配。</li>
+</ul>
+<h3 id="3-SORT的运动模型">3. SORT的运动模型</h3>
+<p>SORT算法通过为每个目标定义一个对象模型，将目标的身份和运动状态从当前帧传播到下一帧。为了简化计算，SORT使用了一个线性恒速模型来近似每个目标的帧间位移，这个模型假设目标在每帧之间的位移是恒定的，与其他物体和摄像机的运动无关。</p>
+<p>目标的完整状态向量为：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi mathvariant="bold">x</mi><mo>=</mo><mo stretchy="false">[</mo><mi>u</mi><mo separator="true">,</mo><mi>v</mi><mo separator="true">,</mo><mi>s</mi><mo separator="true">,</mo><mi>r</mi><mo separator="true">,</mo><mover accent="true"><mi>u</mi><mo>˙</mo></mover><mo separator="true">,</mo><mover accent="true"><mi>v</mi><mo>˙</mo></mover><mo separator="true">,</mo><mover accent="true"><mi>s</mi><mo>˙</mo></mover><mo stretchy="false">]</mo></mrow><annotation encoding="application/x-tex">\mathbf{x} = [u, v, s, r, \dot{u}, \dot{v}, \dot{s}]
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal">u</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">s</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">˙</span></span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></p>
+<p>其中：</p>
+<ul>
+<li>**u 和 v：**目标中心位置的坐标（通常为 x 和 y）</li>
+<li>**s：**目标的尺度（通常是目标框的面积）</li>
+<li>**r：**目标的纵横比（aspect ratio）</li>
+<li>**<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>u</mi><mtext>˙</mtext><mover accent="true"><mi>u</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">u˙\dot{u}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord mathnormal">u</span><span class="mord">˙</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">u</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span> 和$ v˙\dot{v}$：**目标在 u 和 v 方向上的速度。</li>
+<li>**<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>s</mi><mtext>˙</mtext><mover accent="true"><mi>s</mi><mo>˙</mo></mover></mrow><annotation encoding="application/x-tex">s˙\dot{s}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6679em;"></span><span class="mord mathnormal">s</span><span class="mord">˙</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6679em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">s</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.0833em;"><span class="mord">˙</span></span></span></span></span></span></span></span></span></span>：**目标尺度的变化速率。</li>
+</ul>
+<p>SORT算法具有较低的计算复杂度，适合实时追踪，但由于它仅基于目标的运动信息（位置和速度），对目标间的遮挡、外观变化、长时间丢失等情况的鲁棒性较差。</p>
+<p>为了提升跟踪的精度和鲁棒性，<strong>DeepSORT</strong> 应运而生——通过结合深度学习特征和传统的运动预测模型，DeepSORT不仅能够有效解决目标间的相似性判别问题，还能显著增强目标在长时间遮挡或交叉运动中的追踪稳定性。</p>
+<h2 id="三、DeepSORT">三、DeepSORT</h2>
+<h3 id="1-DeepSORT-介绍">1. DeepSORT 介绍</h3>
+<p><strong>DeepSORT</strong>（Deep Learning-based SORT）是基于SORT（Simple Online and Realtime Tracking）算法的改进版，整体框架延续了 SORT 的核心思路，仍然采用了 <strong>卡尔曼滤波</strong> 和 <strong>匈牙利算法</strong> 进行目标的运动预测和数据关联。然而，DeepSORT 在此基础上引入了一个关键改进：<strong>鉴别网络（Deep Association Metric）</strong>，用于增强目标之间的匹配精度。</p>
+<h3 id="2-DeepSORT-算法">2. DeepSORT 算法</h3>
+<h4 id="DeepSORT-关键工作流程">- DeepSORT 关键工作流程</h4>
+<ol>
+<li>
+<p><strong>轨迹卡尔曼滤波预测</strong>：</p>
+<ul>
+<li>对于每个已追踪的目标，卡尔曼滤波器会基于目标的当前位置和速度，预测目标在当前帧中的位置。这一过程是根据目标的运动模型（例如线性恒速模型）进行的，主要用于估计目标在下一帧的可能位置。</li>
+</ul>
+</li>
+<li>
+<p><strong>使用匈牙利算法进行匹配</strong>：</p>
+<ul>
+<li>
+<p>匈牙利算法用于解决目标匹配问题，将</p>
+<p>预测后的目标轨迹tracked targets）与 当前帧中的检测框（detections）进行匹配。这里的匹配通常通过两种方式进行：</p>
+<ul>
+<li><strong>级联匹配</strong>（Cascade Matching）：首先进行粗匹配，然后逐步精细化，确保每个目标的匹配都是最合适的。</li>
+<li><strong>IOU匹配</strong>（Intersection over Union matching）：通过计算目标边界框与检测框之间的 <strong>IOU</strong> 值，匹配预测轨迹和当前帧中的检测目标。IOU值较高的目标会被认为是同一个目标，从而进行匹配。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>卡尔曼滤波更新</strong>：</p>
+<ul>
+<li>在目标匹配后，卡尔曼滤波器会根据匹配结果对目标的状态进行 <strong>更新</strong>。这一步会根据实际检测到的目标位置来修正预测轨迹，从而提高追踪的准确性。</li>
+</ul>
+</li>
+</ol>
+<p>流程图如下：</p>
+<p><img src="/img/DeepLearning/Sort_DeepSort/image-20200430003426746.png" srcset="/img/loading.gif" lazyload alt="DeepSort工作流程"></p>
+<h4 id="级联匹配流程">- 级联匹配流程</h4>
+<p>这个流程是DeepSORT多目标跟踪算法中确保目标准确匹配的重要步骤</p>
+<ol>
+<li>
+<p><strong>距离计算</strong>：</p>
+<ul>
+<li>
+<p>使用 <strong>马氏距离（Mahalanobis Distance, d1）</strong> 和 <strong>余弦距离（Cosine Distance, d2）</strong>，通过线性加权方式生成 <strong>代价矩阵（Cost Matrix）</strong>：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mi>C</mi><mo>=</mo><mi>λ</mi><msub><mi>d</mi><mn>1</mn></msub><mo>+</mo><mo stretchy="false">(</mo><mn>1</mn><mo>−</mo><mi>λ</mi><mo stretchy="false">)</mo><msub><mi>d</mi><mn>2</mn></msub></mrow><annotation encoding="application/x-tex">C= \lambda d_1 + (1 - \lambda) d_2
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord mathnormal">λ</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">λ</span><span class="mclose">)</span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+</li>
+<li>
+<p><strong>马氏距离</strong> 表示运动模型的匹配程度，衡量预测轨迹与检测框之间的一致性</p>
+</li>
+<li>
+<p><strong>余弦距离</strong> 衡量外观特征的相似性，判断目标外观的一致性</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>门限限制（Gate Matrix）</strong>：</p>
+<ul>
+<li>引入一个 <strong>门限（gating_threshold）</strong> 来过滤掉不可能的匹配结果，生成 <strong>Gate Matrix</strong>，将代价矩阵中超过最大距离**（max_distance）**的匹配关系剔除，减少误匹配</li>
+</ul>
+</li>
+<li>
+<p><strong>匈牙利算法（Hungarian Algorithm）进行分配</strong>：</p>
+<ul>
+<li>根据生成的代价矩阵，使用 <strong>匈牙利算法</strong> 在当前帧中的检测结果和轨迹之间进行匹配</li>
+</ul>
+</li>
+<li>
+<p><strong>级联匹配</strong>：</p>
+<ul>
+<li>以目标轨迹的 <strong>age（年龄）</strong> 为顺序，优先匹配 <strong>missing age = 0</strong>（即刚更新过的轨迹）对应的检测框，确保更新最频繁的目标优先匹配</li>
+<li>如果有轨迹未匹配成功，其 <strong>missing age</strong> 加1，继续尝试匹配，直到达到最大允许丢失帧数**（max_age）**</li>
+<li>重复该过程直至所有检测和轨迹匹配完成</li>
+</ul>
+</li>
+<li>
+<p><strong>输出结果</strong>：</p>
+<ul>
+<li>返回已匹配的轨迹集合和未匹配的检测集合，用于更新目标状态或初始化新的目标轨迹</li>
+</ul>
+</li>
+</ol>
+<p>流程图如下：</p>
+<p><img src="/img/DeepLearning/Sort_DeepSort/image-20200430004523485.png" srcset="/img/loading.gif" lazyload alt="级联匹配"></p>
+<h2 id="四、总结">四、总结</h2>
+<h3 id="1-SORT算法">1. <strong>SORT算法</strong></h3>
+<p>SORT（Simple Online and Realtime Tracking）是一种轻量级且高效的多目标跟踪算法，它依赖于强大的目标检测器（如Faster R-CNN）提供检测框，通过结合 <strong>卡尔曼滤波</strong> 和 <strong>匈牙利算法</strong> 实现目标的实时跟踪。</p>
+<ul>
+<li><strong>卡尔曼滤波</strong>：用于预测目标在下一帧的位置，通过运动模型更新目标状态。</li>
+<li><strong>匈牙利算法</strong>：解决目标匹配问题，将检测框和预测轨迹进行关联。</li>
+</ul>
+<p>虽然SORT算法简单高效，但在目标遮挡、密集场景以及外观相似的目标之间容易出现错误匹配。</p>
+<h3 id="2-DeepSORT算法">2. <strong>DeepSORT算法</strong></h3>
+<p>DeepSORT是SORT算法的改进版本，在保持高效性的同时，提升了多目标跟踪的准确性和鲁棒性。主要改进包括：</p>
+<ol>
+<li><strong>增加了级联匹配</strong>：通过优先匹配更新频繁的轨迹（即轨迹“年龄”较小的目标），减少了误匹配和目标丢失。</li>
+<li><strong>引入目标确认机制</strong>：增加了“确认状态”（Confirmed Tracks）的概念，只有经过多帧匹配的目标才会被确认，从而避免短时噪声目标干扰。</li>
+<li><strong>深度外观特征的融合</strong>：引入深度学习提取的外观特征（Deep Association Metric），结合马氏距离和余弦距离来优化匹配过程，大幅提高了在目标遮挡或外观相似情况下的跟踪效果。</li>
+</ol>
+<ul>
+<li><strong>卡尔曼滤波 + 匈牙利算法</strong>：依然是跟踪的基础框架，用于处理运动状态的预测和检测框的匹配。</li>
+</ul>
+<h3 id="参考文献">参考文献</h3>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/59148865">https://zhuanlan.zhihu.com/p/59148865</a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/646154999">https://zhuanlan.zhihu.com/p/646154999</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/zimiao552147572/article/details/106009021">https://blog.csdn.net/zimiao552147572/article/details/106009021</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div></div>
+      <div>https://laojiao1.github.io/2025/01/12/DeepLearning/Sort_DeepSort/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/11/algorithm/SqlEncryption/" title="【算法】AES-数据库加密算法">
+                        <span class="hidden-mobile">【算法】AES-数据库加密算法</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
