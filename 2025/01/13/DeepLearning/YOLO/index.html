@@ -347,7 +347,7 @@
 <p>（2）在每个网格单元格中都会预测B个边界框，一般是两个，每一个边界框会预测一个置信度表示该边界框中是否包含目标。</p>
 <p><img src="/img/DeepLearning/YOLO/image-20250113154031523.png" srcset="/img/loading.gif" lazyload alt=""></p>
 <p>（3）接下来对这些边界框进行NMS筛选（置信度以及IoU），删去重叠度较高的预测框，获取最优的检测结果。</p>
-<p><img src="/img/DeepLearning/YOLO/image-20250113154049190.png" srcset="/img/loading.gif" lazyload alt=""><img src="/img/DeepLearning/YOLO/image-20250113154201321.png" srcset="/img/loading.gif" lazyload alt="image-20250113154201321"></p>
+<div class="group-image-container"><div class="group-image-row"><div class="group-image-wrap"><img src="/img/DeepLearning/YOLO/image-20250113154049190.png" srcset="/img/loading.gif" lazyload alt=""></div><div class="group-image-wrap"><img src="/img/DeepLearning/YOLO/image-20250113154201321.png" srcset="/img/loading.gif" lazyload alt=""></div></div></div>
 <h3 id="3-单元格（grid-cell）">3. 单元格（grid cell）</h3>
 <p>上面第二步是理解YOLO网络的关键。YOLO 的输出是一个大小为 <strong>7 × 7 × 30</strong> 的特征图。这意味着输入图像被分成了 <strong>7 × 7 = 49 个网格单元格</strong>，每个单元格会预测若干个边界框以及相关的置信度分数和类别概率。</p>
 <h4 id="置信度与边界框">置信度与边界框</h4>
@@ -466,7 +466,7 @@
 <li><strong>右侧</strong>是对左侧的简化结果：直接表示为类别概率 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>P</mi><mi>r</mi></msub><mo stretchy="false">(</mo><mtext>Class</mtext><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">P_r(\text{Class})</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord text"><span class="mord">Class</span></span><span class="mclose">)</span></span></span></span> 和 IOU 的乘积。</li>
 </ul>
 <p><strong>个人理解：<strong>这个公式的乘积同时编码了</strong>预测框属于某类别的概率</strong>和<strong>预测框定位的准确性（IOU）</strong>。在后续处理中，可以根据计算得到的这些分数设置阈值，滤除低得分的预测框，然后对剩余的预测框应用 <strong>NMS（非极大值抑制）</strong>，去除重复框，最终保留下置信度高且定位准确的预测框，作为检测结果。</p>
-<p><img src="/img/DeepLearning/YOLO/image-20250113161306397.png" srcset="/img/loading.gif" lazyload alt="image-20250113161306397"></p>
+<p><img src="/img/DeepLearning/YOLO/image-20250113161306397.png" srcset="/img/loading.gif" lazyload alt=""></p>
 <h2 id="总结">总结</h2>
 <h3 id="优点">优点</h3>
 <ol>
@@ -590,8 +590,8 @@ YOLO 能够学习到目标的通用特征表征。例如，将在自然图像上
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/12/OJ/BagDP/P1082/" title="【洛谷】5倍经验日——01背包变形">
-                        <span class="hidden-mobile">【洛谷】5倍经验日——01背包变形</span>
+                      <a href="/2025/01/12/OJ/BagDP/P1048/" title="【洛谷】采药——背包dp">
+                        <span class="hidden-mobile">【洛谷】采药——背包dp</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
