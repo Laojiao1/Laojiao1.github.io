@@ -1,0 +1,848 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="【计算机视觉】YOLOv3 模型 一、前言 YOLOv3模型相较之前复杂了许多，可以通过改变模型结构来权衡速度和精度，而且保留了很多v2和v1的特性，建议在看此篇文章之前，先对YOLO算法做一下简单了解：YOLO算法简述 我们先看一下计算机是如何确定一张图中物体所在位置的：  那YOLOv3是如何确定这四个参数呢？ 当一张图被传入到YOLOv3的网络中时，首先会被调成416×416的大小，为了防止">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【计算机视觉】YOLOv3 模型">
+<meta property="og:url" content="https://laojiao1.github.io/2025/01/14/DeepLearning/YOLOv3/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="【计算机视觉】YOLOv3 模型 一、前言 YOLOv3模型相较之前复杂了许多，可以通过改变模型结构来权衡速度和精度，而且保留了很多v2和v1的特性，建议在看此篇文章之前，先对YOLO算法做一下简单了解：YOLO算法简述 我们先看一下计算机是如何确定一张图中物体所在位置的：  那YOLOv3是如何确定这四个参数呢？ 当一张图被传入到YOLOv3的网络中时，首先会被调成416×416的大小，为了防止">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/YOLOv3/bound.png">
+<meta property="article:published_time" content="2025-01-14T07:48:35.297Z">
+<meta property="article:modified_time" content="2025-01-14T07:48:35.297Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="DeepLearning">
+<meta property="article:tag" content="OpenCV">
+<meta property="article:tag" content="目标检测">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/DeepLearning/YOLOv3/bound.png">
+  
+  
+  
+  <title>【计算机视觉】YOLOv3 模型 - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【计算机视觉】YOLOv3 模型"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-14 15:48" pubdate>
+          2025年1月14日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          24 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【计算机视觉】YOLOv3 模型</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>【计算机视觉】YOLOv3 模型</h1>
+<h2 id="一、前言">一、前言</h2>
+<p>YOLOv3模型相较之前复杂了许多，可以通过<strong>改变模型结构来权衡速度和精度</strong>，而且保留了很多v2和v1的特性，建议在看此篇文章之前，先对YOLO算法做一下简单了解：<a href="https://laojiao1.github.io/2025/01/13/DeepLearning/YOLO/">YOLO算法简述</a></p>
+<p>我们先看一下计算机是如何确定一张图中物体所在位置的：</p>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114122206591.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>那YOLOv3是如何确定这四个参数呢？</p>
+<p>当一张图被传入到YOLOv3的网络中时，首先会被调成416×416的大小，为了防止失真，在图像的边缘加上灰度条，之后它会将图片分为13×13，26×26，52×52的网格。由于图像在多次卷积压缩后，小物体的特征容易消失，所以52×52的网格用于检测小物体，13×13的物体用来检测大物体。</p>
+<p>由于猫是一个比较大的物体，所以它由13×13的网格检测，每个网格点负责其右下角区域的检测，如果物体的中心点落在这个区域，这个物体的位置就由这个网格点确定。</p>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114122213873.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p><strong>总结而言</strong>：YOLOv3把一张图片分成不同的网络，每个网络点负责一个区域的识别，只要物体的中心点落在这个区域，这个物体就由这个网格点来确定。</p>
+<h2 id="二、YOLOv3-网络结构解析">二、YOLOv3 网络结构解析</h2>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114122220211.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>可以看到：整个YOLOv3结构里面，<strong>没有池化层和全连接层</strong>，网络的下采样是通过设置卷积的stride=2来达到的，每当通过这个卷积层之后图像的尺寸就会减小到一半。残差模块中的1×，2×，8×，8× 等表示残差模块的个数。</p>
+<p>此外，YOLOv3所使用的主干特征提取网络为Darknet53，它具有两个重要特点：</p>
+<ol>
+<li><strong>使用了残差网络 Residual</strong>：网络越深，梯度消失的现象就越来越明显，网络的训练效果也不会很好。残差神经网络就是为了在加深网络的情况下，来解决梯度消失的问题。残差结构可以不通过卷积，直接从前面一个特征层映射到后面的特征层（跳跃连接），缓解了在深度神经网络中增加深度带来的梯度消失问题，容易优化。</li>
+<li>Darknet53的<strong>每一个DarknetConv2D后面都紧跟Batch Normalization标准化与Leaky ReLU部分</strong>。普通的ReLU是将所有的负值都设为零——可能会导致神经元死亡问题；而Leaky ReLU则是给所有负值赋予一个非零斜率——在负值区域保留了一定的梯度信息，可以缓解神经元死亡的问题，使网络更易于训练。</li>
+</ol>
+<p>整个主干代码如下:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> functools <span class="hljs-keyword">import</span> wraps<br><br><span class="hljs-keyword">from</span> keras.initializers <span class="hljs-keyword">import</span> random_normal<br><span class="hljs-keyword">from</span> keras.layers <span class="hljs-keyword">import</span> (Add, BatchNormalization, Conv2D, LeakyReLU,<br>                          ZeroPadding2D)<br><span class="hljs-keyword">from</span> keras.regularizers <span class="hljs-keyword">import</span> l2<br><span class="hljs-keyword">from</span> utils.utils <span class="hljs-keyword">import</span> compose<br><br><br><span class="hljs-comment">#---------------------------------------------------#</span><br><span class="hljs-comment">#   单次卷积</span><br><span class="hljs-comment">#   DarknetConv2D</span><br><span class="hljs-comment">#---------------------------------------------------#</span><br><span class="hljs-meta">@wraps(<span class="hljs-params">Conv2D</span>)</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">DarknetConv2D</span>(<span class="hljs-params">*args, **kwargs</span>):<br>    darknet_conv_kwargs = &#123;<span class="hljs-string">&#x27;kernel_initializer&#x27;</span> : random_normal(stddev=<span class="hljs-number">0.02</span>), <span class="hljs-string">&#x27;kernel_regularizer&#x27;</span>: l2(<span class="hljs-number">5e-4</span>)&#125;<br>    darknet_conv_kwargs[<span class="hljs-string">&#x27;padding&#x27;</span>] = <span class="hljs-string">&#x27;valid&#x27;</span> <span class="hljs-keyword">if</span> kwargs.get(<span class="hljs-string">&#x27;strides&#x27;</span>)==(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>) <span class="hljs-keyword">else</span> <span class="hljs-string">&#x27;same&#x27;</span><br>    darknet_conv_kwargs.update(kwargs)<br>    <span class="hljs-keyword">return</span> Conv2D(*args, **darknet_conv_kwargs)<br><br><span class="hljs-comment">#---------------------------------------------------#</span><br><span class="hljs-comment">#   卷积块 -&gt; 卷积 + 标准化 + 激活函数</span><br><span class="hljs-comment">#   DarknetConv2D + BatchNormalization + LeakyReLU</span><br><span class="hljs-comment">#---------------------------------------------------#</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">DarknetConv2D_BN_Leaky</span>(<span class="hljs-params">*args, **kwargs</span>):<br>    no_bias_kwargs = &#123;<span class="hljs-string">&#x27;use_bias&#x27;</span>: <span class="hljs-literal">False</span>&#125;<br>    no_bias_kwargs.update(kwargs)<br>    <span class="hljs-keyword">return</span> compose( <br>        DarknetConv2D(*args, **no_bias_kwargs),<br>        BatchNormalization(),<br>        LeakyReLU(alpha=<span class="hljs-number">0.1</span>))<br><br><span class="hljs-comment">#---------------------------------------------------------------------#</span><br><span class="hljs-comment">#   残差结构</span><br><span class="hljs-comment">#   首先利用ZeroPadding2D和一个步长为2x2的卷积块进行高和宽的压缩</span><br><span class="hljs-comment">#   然后对num_blocks进行循环，循环内部是残差结构。</span><br><span class="hljs-comment">#---------------------------------------------------------------------#</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">resblock_body</span>(<span class="hljs-params">x, num_filters, num_blocks</span>):<br>    x = ZeroPadding2D(((<span class="hljs-number">1</span>,<span class="hljs-number">0</span>),(<span class="hljs-number">1</span>,<span class="hljs-number">0</span>)))(x)<br>    x = DarknetConv2D_BN_Leaky(num_filters, (<span class="hljs-number">3</span>,<span class="hljs-number">3</span>), strides=(<span class="hljs-number">2</span>,<span class="hljs-number">2</span>))(x)<br>    <span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(num_blocks):<br>        y = DarknetConv2D_BN_Leaky(num_filters//<span class="hljs-number">2</span>, (<span class="hljs-number">1</span>,<span class="hljs-number">1</span>))(x)<br>        y = DarknetConv2D_BN_Leaky(num_filters, (<span class="hljs-number">3</span>,<span class="hljs-number">3</span>))(y)<br>        x = Add()([x,y])<br>    <span class="hljs-keyword">return</span> x<br><br><span class="hljs-comment">#---------------------------------------------------#</span><br><span class="hljs-comment">#   darknet53 的主体部分</span><br><span class="hljs-comment">#   输入为一张416x416x3的图片</span><br><span class="hljs-comment">#   输出为三个有效特征层</span><br><span class="hljs-comment">#---------------------------------------------------#</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">darknet_body</span>(<span class="hljs-params">x</span>):<br>    <span class="hljs-comment"># 416,416,3 -&gt; 416,416,32</span><br>    x = DarknetConv2D_BN_Leaky(<span class="hljs-number">32</span>, (<span class="hljs-number">3</span>,<span class="hljs-number">3</span>))(x)<br>    <span class="hljs-comment"># 416,416,32 -&gt; 208,208,64</span><br>    x = resblock_body(x, <span class="hljs-number">64</span>, <span class="hljs-number">1</span>)<br>    <span class="hljs-comment"># 208,208,64 -&gt; 104,104,128</span><br>    x = resblock_body(x, <span class="hljs-number">128</span>, <span class="hljs-number">2</span>)<br>    <span class="hljs-comment"># 104,104,128 -&gt; 52,52,256</span><br>    x = resblock_body(x, <span class="hljs-number">256</span>, <span class="hljs-number">8</span>)<br>    feat1 = x<br>    <span class="hljs-comment"># 52,52,256 -&gt; 26,26,512</span><br>    x = resblock_body(x, <span class="hljs-number">512</span>, <span class="hljs-number">8</span>)<br>    feat2 = x<br>    <span class="hljs-comment"># 26,26,512 -&gt; 13,13,1024</span><br>    x = resblock_body(x, <span class="hljs-number">1024</span>, <span class="hljs-number">4</span>)<br>    feat3 = x<br>    <span class="hljs-keyword">return</span> feat1, feat2, feat3<br></code></pre></td></tr></table></figure>
+<h2 id="三、概念引入">三、概念引入</h2>
+<p><strong>在下一步讲解流程原理之前，先来了解一下一些基本概念：</strong></p>
+<p><strong>1. x_offset 和 y_offset</strong></p>
+<ul>
+<li><strong>x_offset</strong>: 表示网格左上角相对于 x 轴的偏移量。</li>
+<li><strong>y_offset</strong>: 表示网格左上角相对于 y 轴的偏移量。</li>
+</ul>
+<p><strong>2. 上采样（UpSampling）</strong><br>
+上采样是<strong>将图像放大以提高分辨率的过程</strong>，也称为图像插值（interpolating）。它的主要作用包括：</p>
+<ul>
+<li>放大原图像，使其适配更高分辨率的显示设备</li>
+<li>在深度学习中，恢复图像的空间细节以便与低分辨率特征图融合</li>
+</ul>
+<p>与之相对的下采样（subsampled）是通过缩小图像尺寸实现以下目的：</p>
+<ul>
+<li>减小图像以适配显示区域的大小</li>
+<li>用于生成图像的缩略图或降低分辨率以提取特征</li>
+</ul>
+<p><strong>3. 先验框（Anchor Box）</strong></p>
+<p>先验框是为常见目标<strong>预定义</strong>的一组宽高比例的框。在目标检测中，它的作用是<strong>辅助预测边界框</strong>的参数（如 x_offset, y_offset, h, 和 w）<br>
+例如：</p>
+<ul>
+<li>
+<p>在 coco 数据集中，输出的维度为 (13,13, (80+5)*3)，其中 <code>3</code> 表示每个网格预测 3 个先验框，每个框有 85 个参数（80 个类别概率 + 5 个框参数）</p>
+</li>
+<li>
+<p>下图中蓝色框即为先验框，代表建议的目标位置范围。它通过预设的宽高比帮助检测器聚焦于目标区域，提高预测框和真实框的 IOU（交并比）。黄色框是最终显示的真实边界框，红色框为预测的目标中心点</p>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114142321097.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+</ul>
+<p><strong>4. 置信度（Confidence）</strong></p>
+<p>置信度表示预测的<strong>先验框与真实框（Ground Truth Box）的 IOU 值</strong>，即预测框中存在目标的概率 Pr(Object)<br>
+例如：</p>
+<ul>
+<li>在人脸识别任务中，如果框中包含人脸，则置信度会越高；反之，如果框中是背景或者其他不相关对象（如树、房子），则置信度接近 0</li>
+<li>置信度的高低直接决定了目标检测框是否有效，是目标检测中非常重要的参数</li>
+</ul>
+<p><strong>5. 交并比（IoU）</strong></p>
+<p>在检测任务中使用交并比（Intersection of Union，IoU）作为衡量<strong>锚框与真实框之间重合度关系</strong>的指标。计算公式如下：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.16em" columnspacing="1em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mi>I</mi><mi>o</mi><mi>U</mi><mo>=</mo><mfrac><mrow><mi>A</mi><mo>∩</mo><mi>B</mi></mrow><mrow><mi>A</mi><mo>∪</mo><mi>B</mi></mrow></mfrac></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{equation}
+IoU = \frac{A \cap B}{A \cup B}
+\end{equation}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.0463em;vertical-align:-0.7732em;"></span><span class="mtable"><span class="col-align-c"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2732em;"><span style="top:-3.2732em;"><span class="pstrut" style="height:3.3603em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07847em;">I</span><span class="mord mathnormal">o</span><span class="mord mathnormal" style="margin-right:0.10903em;">U</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3603em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∪</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∩</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7732em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2732em;"><span style="top:-3.2732em;"><span class="pstrut" style="height:3.3603em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.7732em;"><span></span></span></span></span></span></span></span></span></p>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114141915280.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<h2 id="四、YOLOv3-检测流程原理">四、YOLOv3 检测流程原理</h2>
+<h3 id="1-从特征中获取预测结果">1. 从特征中获取预测结果</h3>
+<p>在特征利用部分，YoloV3提取<strong>多特征层进行目标检测</strong>，一共<strong>提取三个特征层</strong>，分别位于<strong>中间层 (52,52,256)，中下层(26,26,512)，底层(13,13,1024)</strong>。这些特征层随后将通过上采样操作与其他特征层堆叠（Concat）进行融合。</p>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114122241319.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p><strong>底层 (13,13,1024) 的处理：</strong></p>
+<ul>
+<li>从底层特征层 13×13×1024 开始，首先对其进行 <strong>5 次卷积操作</strong>，进一步提取特征</li>
+<li>卷积操作后的特征分为两部分：
+<ol>
+<li><strong>一部分输出预测结果</strong>，经过两个卷积层（Conv2D 3×3 和 Conv2D 1×1）调整通道数，最终生成特征层 13×13×75，作为该尺度的目标检测输出</li>
+<li><strong>另一部分用于上采样</strong>，通过上采样（UpSampling2D）操作生成特征层 26×26×256</li>
+</ol>
+</li>
+</ul>
+<p><strong>中下层特征层 (26,26,512) 的处理：</strong></p>
+<ul>
+<li>上采样后的特征层 26×26×256 与来自 Darknet53 的中下层特征层 26×26×512 进行拼接（Concat），得到融合特征层 26×26×768</li>
+<li>拼接后的特征层经过 5 次卷积操作处理，分为两部分：
+<ol>
+<li><strong>一部分输出预测结果</strong>，通过（Conv2D 3×3 和 Conv2D 1×1）调整通道数，生成特征层 26×26×75</li>
+<li><strong>另一部分用于上采样</strong>，通过上采样操作生成特征层 52×52×128</li>
+</ol>
+</li>
+</ul>
+<p><strong>中间层特征层 (52,52,256) 的处理</strong></p>
+<ul>
+<li>上采样后的特征层 52×52×128 与来自 Darknet53 的中间层特征层 52×52×256 进行拼接（Concat），得到融合特征层 52×52×384</li>
+<li>拼接后的特征层经过 <strong>5 次卷积操作</strong> 处理，最后通过（Conv2D 3×3 和 Conv2D 1×1）调整通道数，生成特征层 52×52×75，作为最终的目标检测输出</li>
+</ul>
+<p><strong>最后生成的3个预测结果：</strong></p>
+<ul>
+<li><strong>52×52×75 特征层</strong>：检测小物体</li>
+<li><strong>26×26×75 特征层</strong>：检测中等物体</li>
+<li><strong>13×13×75特征层</strong>：检测大物体</li>
+</ul>
+<h3 id="2-预测结果的解码">2. 预测结果的解码</h3>
+<p>YOLOv3 网络中的预测结果并不能直接用于定位目标框，因为网络输出的是<strong>相对于特征层或先验框的一些偏移量或归一化值，而不是目标的实际位置信息</strong>。因此还需要通过解码，将网络输出从特征空间转化为输入图像空间中的实际坐标。</p>
+<p>yolov3的预测原理是分别将整幅图分为13x13、26x26、52x52 的网格（实际上有点像三个等分的网格），然后从每个网格中心建立多个<strong>先验框</strong>，典型值是一个特征点三个先验框，这些框是网络<strong>预先设定好的框</strong>，网络的预测结果会判断这些框内是否包含物体，以及这个物体的种类。</p>
+<p>每个边界框的中心点坐标均为相对于其对应的单元格（grid cell）左上点坐标的偏移，其计算公式如下：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mtable rowspacing="0.25em" columnalign="right left" columnspacing="0em"><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>b</mi><mi>x</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mi>x</mi></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>c</mi><mi>x</mi></msub></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>b</mi><mi>y</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><mi>σ</mi><mo stretchy="false">(</mo><msub><mi>t</mi><mi>y</mi></msub><mo stretchy="false">)</mo><mo>+</mo><msub><mi>c</mi><mi>y</mi></msub></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>b</mi><mi>w</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>p</mi><mi>w</mi></msub><mo>⋅</mo><msup><mi>e</mi><msub><mi>t</mi><mi>w</mi></msub></msup></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr><mtr><mtd class ="mtr-glue"></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><msub><mi>b</mi><mi>h</mi></msub></mstyle></mtd><mtd><mstyle scriptlevel="0" displaystyle="true"><mrow><mrow></mrow><mo>=</mo><msub><mi>p</mi><mi>h</mi></msub><mo>⋅</mo><msup><mi>e</mi><msub><mi>t</mi><mi>h</mi></msub></msup></mrow></mstyle></mtd><mtd class ="mtr-glue"></mtd><mtd class ="mml-eqn-num"></mtd></mtr></mtable><annotation encoding="application/x-tex">\begin{align}
+b_x &amp; = \sigma(t_x) + c_x \\
+b_y &amp; = \sigma(t_y) + c_y \\
+b_w &amp; = p_w \cdot e^{t_w} \\
+b_h &amp; = p_h \cdot e^{t_h} \\
+\end{align}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:6.0071em;vertical-align:-2.7536em;"></span><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2536em;"><span style="top:-5.4136em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.9136em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-0.9064em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7536em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2536em;"><span style="top:-5.4136em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.9136em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8436em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span style="top:-0.9064em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathnormal">e</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8436em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7536em;"><span></span></span></span></span></span></span></span><span class="tag"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2536em;"><span style="top:-5.2571em;"><span class="pstrut" style="height:2.8436em;"></span><span class="eqn-num"></span></span><span style="top:-3.7571em;"><span class="pstrut" style="height:2.8436em;"></span><span class="eqn-num"></span></span><span style="top:-2.2536em;"><span class="pstrut" style="height:2.8436em;"></span><span class="eqn-num"></span></span><span style="top:-0.75em;"><span class="pstrut" style="height:2.8436em;"></span><span class="eqn-num"></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7536em;"><span></span></span></span></span></span></span></span></span></p>
+<ul>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>c</mi><mi>x</mi></msub><mo separator="true">,</mo><msub><mi>c</mi><mi>y</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(c_x, c_y)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>：该点所在网格的左上角距离最左上角相差的格子数</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>b</mi><mi>x</mi></msub><mo separator="true">,</mo><msub><mi>b</mi><mi>y</mi></msub><mo separator="true">,</mo><msub><mi>b</mi><mi>w</mi></msub><mo separator="true">,</mo><msub><mi>b</mi><mi>h</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(b_x, b_y, b_w, b_h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">b</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>：最后显示的边界框的坐标及其宽高</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>t</mi><mi>x</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>y</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>w</mi></msub><mo separator="true">,</mo><msub><mi>t</mi><mi>h</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(t_x, t_y, t_w, t_h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">x</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03588em;">y</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>：目标中心点相对于该点所在的单元格中左上角的偏移量及其预测边框的宽和高</li>
+<li><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><msub><mi>p</mi><mi>w</mi></msub><mo separator="true">,</mo><msub><mi>p</mi><mi>h</mi></msub><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(p_w, p_h)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02691em;">w</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>：先验框的边长</li>
+<li>σ：激活函数，YOLOv3里用的是sigmoid函数，范围在[0,1]之间。这里用sigmoid取代之前版本的softmax，原因是softmax会扩大最大类别概率值而抑制其他类别概率值</li>
+</ul>
+<p>图解如下：</p>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114135954456.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<h3 id="3-非极大值抑制（NMS）">3. 非极大值抑制（NMS）</h3>
+<p>这一步就是对最终的预测结果进行<strong>得分排序与非极大抑制筛选</strong>。</p>
+<p>非极大值抑制（NMS）的具体流程如下：</p>
+<ol>
+<li><strong>根据置信度排序</strong>：将所有边界框按照置信度得分从高到低排序。</li>
+<li><strong>选择最高置信度框</strong>：取置信度最高的边界框，加入最终的输出结果列表，并将其从候选边界框列表中移除。</li>
+<li><strong>计算边界框面积</strong>：对剩余候选边界框计算其面积，用于后续 IoU 的计算。</li>
+<li><strong>计算 IoU</strong>：计算当前选中的最高置信度框与其他候选框之间的 IoU 值。</li>
+<li><strong>剔除高 IoU 框</strong>：将 IoU 大于指定阈值的候选框从列表中移除（认为是重复框）。</li>
+<li><strong>重复以上步骤</strong>：继续从剩余的候选框中选择置信度最高的框，并重复上述过程，直到候选框列表为空。</li>
+<li><strong>输出结果</strong>：返回最终保留的边界框列表作为检测结果。</li>
+</ol>
+<p>例如：</p>
+<ul>
+<li>阈值为0.6</li>
+</ul>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114140436498.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<ul>
+<li>阈值为0.5</li>
+</ul>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114140924931.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<ul>
+<li>阈值为0.4</li>
+</ul>
+<p><img src="/img/DeepLearning/YOLOv3/image-20250114140636578.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<h2 id="参考文献">参考文献</h2>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_39615182/article/details/109752498">https://blog.csdn.net/weixin_39615182/article/details/109752498</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/weixin_44791964/article/details/103276106">https://blog.csdn.net/weixin_44791964/article/details/103276106</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1XJ411D7wF?vd_source=2b06cc402150237b16279df9e94ff252&amp;spm_id_from=333.788.videopod.episodes">https://www.bilibili.com/video/BV1XJ411D7wF?vd_source=2b06cc402150237b16279df9e94ff252&amp;spm_id_from=333.788.videopod.episodes</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.jianshu.com/p/d452b5615850">https://www.jianshu.com/p/d452b5615850</a></li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/DeepLearning/" class="category-chain-item">DeepLearning</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/DeepLearning/" class="print-no-link">#DeepLearning</a>
+      
+        <a href="/tags/OpenCV/" class="print-no-link">#OpenCV</a>
+      
+        <a href="/tags/%E7%9B%AE%E6%A0%87%E6%A3%80%E6%B5%8B/" class="print-no-link">#目标检测</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【计算机视觉】YOLOv3 模型</div>
+      <div>https://laojiao1.github.io/2025/01/14/DeepLearning/YOLOv3/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月14日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/13/DeepLearning/YOLO/" title="【计算机视觉】YOLO 算法简述">
+                        <span class="hidden-mobile">【计算机视觉】YOLO 算法简述</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
