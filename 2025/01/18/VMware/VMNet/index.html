@@ -27,8 +27,8 @@
 <meta property="og:description" content="【VMware】虚拟网络配置 1. 目前痛点 目前虚拟机联网方式为桥接模式，这种模式下，虚拟机通过主机的物理网卡，直接连接到主机所在的网络当中。具体效果如下图所示。  这种模式下存在两个痛点  主机必须连接到某个网络中，主机和虚拟机才能互通。 更换网络后，主机和虚拟机的IP地址均会发生变化，因此远程访问工具中的IP需要同步进行修改。  为解决上述痛点，我们需要调整虚拟机的网络模式和配置静态IP。">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://laojiao1.github.io/img/others/VMware.png">
-<meta property="article:published_time" content="2025-01-18T02:15:12.269Z">
-<meta property="article:modified_time" content="2025-01-18T02:15:12.269Z">
+<meta property="article:published_time" content="2025-01-18T02:52:04.000Z">
+<meta property="article:modified_time" content="2025-01-18T02:52:04.000Z">
 <meta property="article:author" content="Laojiao">
 <meta property="article:tag" content="VMware">
 <meta name="twitter:card" content="summary_large_image">
@@ -246,7 +246,7 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-01-18 10:15" pubdate>
+        <time datetime="2025-01-18 10:52" pubdate>
           2025年1月18日 上午
         </time>
       </span>
@@ -258,7 +258,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.8k 字
+          1.9k 字
         
       </span>
     
@@ -352,9 +352,9 @@
 <p>仅主机模式的原理如下图所示</p>
 <img src="/img/VMware/VMNet/VMware网络配置-仅主机模式.drawio.png" srcset="/img/loading.gif" lazyload style="zoom:50%;" />
 <p>这种模式，和NAT模式十分相似，唯一的区别是，<strong>虚拟路由器并未连接到主机所在的网络中</strong>，因此主机和虚拟机之间可以互通，但是虚拟机不能访问互联网。</p>
-<h3 id="2-5-网络模式选择">2.5 网络模式选择</h3>
+<h2 id="3-网络模式选择">3. 网络模式选择</h2>
 <p>为保证主机未联网的情况下，主机和虚拟机也能实现互通；同时保证主机联网的情况下虚拟机也能访问互联网，我们最好选择上述三种模式中的<strong>NAT模式</strong>，具体配置如下。</p>
-<h4 id="2-5-1-VMware虚拟网络配置">2.5.1 VMware虚拟网络配置</h4>
+<h3 id="3-1-VMware虚拟网络配置">3.1 VMware虚拟网络配置</h3>
 <ol>
 <li>
 <p>点击VMware菜单栏中的<code>编辑</code>，选择<code>虚拟网络编辑器</code></p>
@@ -379,7 +379,7 @@
 <p>NAT网关IP须位于VMnet8子网IP范围内。</p>
 </li>
 </ol>
-<h4 id="2-5-3-虚拟机选择网络模式">2.5.3 虚拟机选择网络模式</h4>
+<h3 id="3-2-虚拟机选择网络模式">3.2 虚拟机选择网络模式</h3>
 <ol>
 <li>
 <p>修改虚拟机所使用的网络模式</p>
@@ -390,7 +390,7 @@
 <img src="/img/VMware/VMNet/虚拟机选择网络模式-NAT.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
 </li>
 </ol>
-<h4 id="2-5-2-Windows主机网络配置">2.5.2 Windows主机网络配置</h4>
+<h3 id="3-3-Windows主机网络配置">3.3 Windows主机网络配置</h3>
 <p>上述配置中，VMware已将Windows主机连接到虚拟网络中了，此处只需查看Windows主机中的虚拟网络网卡配置是否正确即可。</p>
 <ol>
 <li>
@@ -408,7 +408,7 @@
 <p>主机IP须位于VMnet8子网IP范围内。</p>
 </li>
 </ol>
-<h2 id="3-配置静态IP">3. 配置静态IP</h2>
+<h2 id="4-配置静态IP">4. 配置静态IP</h2>
 <p>NAT模式下，虚拟机的IP地址，<strong>默认情况下是由虚拟DHCP服务自动分配的</strong>，虚拟机的<strong>IP地址不固定</strong>，这对于SSH远程访问也不友好，所以通常情况下，我们不使用虚拟DHCP服务，而是手动为虚拟机配置静态的IP地址。具体操作如下。</p>
 <ol>
 <li>
@@ -450,6 +450,15 @@
 <p>在终端执行<code>ifoconfig</code>命令，观察<code>ens33</code>的网络接口的IP地址是否为前文所配置的<code>IPADDR</code>。</p>
 </li>
 </ol>
+<p><strong>到此，虚拟网络配置完毕！</strong></p>
+<h2 id="5-检查网络">5. 检查网络</h2>
+<p>大家可以在自己的虚拟机上打开网页，查看是否联网成功。</p>
+<p><img src="/img/VMware/VMNet%5Cpasted-0.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>输入<code>www.baidu.com</code></p>
+<p><img src="/img/VMware/VMNet%5Cpasted-1.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>访问成功！</p>
+<p><img src="/img/VMware/VMNet%5Cpasted-2.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>大家可以在自己的虚拟机上搞一些好玩的东西啦！</p>
 
                 
               </div>
@@ -544,8 +553,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/18/VMware/VMware/" title="【VMware】创建自己的虚拟机并为其配置">
-                        <span class="hidden-mobile">【VMware】创建自己的虚拟机并为其配置</span>
+                      <a href="/2025/01/17/algorithm/SqlEncryption/" title="【算法】AES-数据库加密算法">
+                        <span class="hidden-mobile">【算法】AES-数据库加密算法</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
