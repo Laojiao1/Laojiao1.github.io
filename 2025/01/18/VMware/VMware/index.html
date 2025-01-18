@@ -1,0 +1,906 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="【VMware】创建自己的虚拟机并为其配置 1. 安装VMware   双击VMware-workstation-full-17.0.0-20800274.exe安装包，启动安装向导，并点击下一步。    查看用户许可协议，勾选接收并点击下一步。    选择安装路径，可以不放在C盘，点击下一步    用户体验设置，建议取消勾选，并点击下一步    创建快捷方式，建议勾选，并点击下一步    点击安">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【VMware】创建自己的虚拟机并为其配置">
+<meta property="og:url" content="https://laojiao1.github.io/2025/01/18/VMware/VMware/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="【VMware】创建自己的虚拟机并为其配置 1. 安装VMware   双击VMware-workstation-full-17.0.0-20800274.exe安装包，启动安装向导，并点击下一步。    查看用户许可协议，勾选接收并点击下一步。    选择安装路径，可以不放在C盘，点击下一步    用户体验设置，建议取消勾选，并点击下一步    创建快捷方式，建议勾选，并点击下一步    点击安">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/others/VMware.png">
+<meta property="article:published_time" content="2025-01-18T01:07:49.167Z">
+<meta property="article:modified_time" content="2025-01-18T01:07:49.167Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="VMware">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/others/VMware.png">
+  
+  
+  
+  <title>【VMware】创建自己的虚拟机并为其配置 - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【VMware】创建自己的虚拟机并为其配置"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-18 09:07" pubdate>
+          2025年1月18日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          9 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【VMware】创建自己的虚拟机并为其配置</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>【VMware】创建自己的虚拟机并为其配置</h1>
+<h2 id="1-安装VMware">1. 安装VMware</h2>
+<ol>
+<li>
+<p>双击<code>VMware-workstation-full-17.0.0-20800274.exe</code>安装包，启动安装向导，并点击<code>下一步</code>。</p>
+<img src="/img/VMware/VMware/image-20250118091044086.png" srcset="/img/loading.gif" lazyload style="zoom: 80%;" />
+</li>
+<li>
+<p>查看用户许可协议，勾选接收并点击<code>下一步</code>。</p>
+<img src="/img/VMware/VMware/image-20250118091056870.png" srcset="/img/loading.gif" lazyload style="zoom: 80%;" />
+</li>
+<li>
+<p>选择安装路径，可以不放在C盘，点击<code>下一步</code></p>
+<img src="/img/VMware/VMware/image-20250118091059922.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>用户体验设置，<strong>建议取消勾选</strong>，并点击<code>下一步</code></p>
+<img src="/img/VMware/VMware/image-20250118091108050.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>创建快捷方式，建议勾选，并点击<code>下一步</code></p>
+<img src="/img/VMware/VMware/image-20250118091546079.png" srcset="/img/loading.gif" lazyload alt="image-20250118091546079" style="zoom:80%;" />
+</li>
+<li>
+<p>点击<code>安装</code>，开始进行安装。</p>
+<img src="/img/VMware/VMware/image-20250118091541565.png" srcset="/img/loading.gif" lazyload alt="image-20250118091541565" style="zoom:80%;" />
+</li>
+<li>
+<p>等待完成安装</p>
+<img src="/img/VMware/VMware/image-20250118091537379.png" srcset="/img/loading.gif" lazyload alt="image-20250118091537379" style="zoom:80%;" />
+</li>
+<li>
+<p>点击<code>完成</code>，结束向导</p>
+<img src="/img/VMware/VMware/image-20250118091531407.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>启动VMware，可填入许可秘钥进行激活（可以网上搜一下最新许可证），或者选择30天试用。</p>
+<img src="/img/VMware/VMware/image-20250118091204088.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+</ol>
+<h2 id="2-安装虚拟机">2. 安装虚拟机</h2>
+<ol>
+<li>点击<code>创建新的虚拟机</code>， 启动向导</li>
+</ol>
+<img src="/img/VMware/VMware/image-20250118091301305.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+<ol start="2">
+<li>
+<p>选择典型向导，并点击<code>下一步</code></p>
+<img src="/img/VMware/VMware/image-20250118091323830.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择稍后安装操作系统，并点击<code>下一步</code></p>
+<img src="/img/VMware/VMware/image-20250118091341553.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择操作系统类型，分别选择<code>Linux</code>和<code>Centos 7 64 位</code>，并点击<code>下一步</code></p>
+<img src="/img/VMware/VMware/image-20250118091515937.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>为虚拟机命令并选择安装目录，完成后点击<code>下一步</code></p>
+<p><strong>注意：存放虚拟机的目录不能与安装VMware的目录同级，必须要重新新建一个文件目录存放，否则无法创建虚拟机。</strong></p>
+<img src="/img/VMware/VMware/image-20250118091600723.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>设置磁盘大小，建议<code>40G</code>，完成后点击<code>下一步</code></p>
+<p><strong>注意：这里的40G并不是说创建虚拟机后立刻就占磁盘空间40G，而是随着虚拟机资源不断增多，所占空间的上限为40G。</strong></p>
+<p><strong>所以不用担心一下子占很多磁盘空间的问题。</strong></p>
+<img src="/img/VMware/VMware/image-20250118091425884.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>点击<code>自定义硬件</code></p>
+<img src="/img/VMware/VMware/image-20250118091428478.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>自定义虚拟机内存大小，推荐<code>4G</code>，如果电脑内存比较多的话可以适当提高，但不要超出本身推荐的 “最大建议内存”。</p>
+<img src="/img/VMware/VMware/image-20250118091431011.png" srcset="/img/loading.gif" lazyload style="zoom: 67%;" />
+</li>
+<li>
+<p>自定义虚拟机处理器，推荐1个处理器2个核心</p>
+<img src="/img/VMware/VMware/image-20250118091434290.png" srcset="/img/loading.gif" lazyload style="zoom:67%;" />
+</li>
+<li>
+<p>自定义网络模式，暂时选择<code>桥接模式</code>，后续配置时在进行更改。</p>
+<img src="/img/VMware/VMware/image-20250118091440842.png" srcset="/img/loading.gif" lazyload style="zoom:67%;" />
+</li>
+</ol>
+<h2 id="3-安装Centos7系统">3. 安装Centos7系统</h2>
+<p>Linux系统拥有众多的发行版，其中Centos是最常用于服务器的发行版之一，除此之外，还有Ubuntu、Debian等等。</p>
+<blockquote>
+<p>Linux发行版是指在相同的Linux内核的基础上，增加不同的系统工具和应用程序等，从而构成的一个完整的操作系统。</p>
+</blockquote>
+<ol>
+<li>
+<p>下载Centos系统镜像</p>
+<p>IOS镜像的下载地址为：</p>
+<ul>
+<li>
+<p>官网：<a target="_blank" rel="noopener" href="https://www.centos.org/download/">https://www.centos.org/download/</a></p>
+</li>
+<li>
+<p>国内镜像：<a target="_blank" rel="noopener" href="http://mirrors.aliyun.com/centos/7/isos/x86_64/">http://mirrors.aliyun.com/centos/7/isos/x86_64/</a></p>
+</li>
+</ul>
+</li>
+<li>
+<p>安装系统镜像，选择<code>CD/DVD</code>模式</p>
+<img src="/img/VMware/VMware/安装系统镜像.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择ISO镜像，并指定<code>CentOS-7-x86_64-DVD-2009.iso</code>镜像所在路径，完成后点击<code>确定</code></p>
+<img src="/img/VMware/VMware/选择IOS镜像路径.png" srcset="/img/loading.gif" lazyload style="zoom: 67%;" />
+</li>
+<li>
+<p>开启虚拟机，开始安装系统</p>
+<p><img src="/img/VMware/VMware/%E5%BC%80%E5%90%AF%E8%99%9A%E6%8B%9F%E6%9C%BA.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+<li>
+<p>鼠标点击虚拟机屏幕，进入虚拟机（如需返回主机系统，同时按住<code>Ctrl</code>和<code>Alt</code>键），使用上下前切换安装选项，选中第一项<code>Install Centos 7</code>（白色为选中），然后点击回车键。</p>
+<p><img src="/img/VMware/VMware/%E5%BC%80%E5%A7%8B%E5%AE%89%E8%A3%85%E7%B3%BB%E7%BB%9F.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+<li>
+<p>等待启动安装向导</p>
+<img src="/img/VMware/VMware/等待启动向导.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>向导启动成功后，界面如下图所示</p>
+<img src="/img/VMware/VMware/安装向导已启动.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择系统语言，推荐<code>中文</code>，完成后点击<code>继续</code></p>
+<img src="/img/VMware/VMware/选择系统语言.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择系统时区，要求选择<code>亚洲/上海</code>。</p>
+<img src="/img/VMware/VMware/选择时区.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择预置软件，推荐选择<code>Gnome</code>，它是一个linus系统下的图形化界面</p>
+<img src="/img/VMware/VMware/软件选择.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择系统安装位置，推荐使用自动配置分区</p>
+<img src="/img/VMware/VMware/安装位置.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>关闭KDUMP，已节省资源</p>
+<img src="/img/VMware/VMware/关闭KDUMP.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>上述内容设置完毕后，点击开始安装</p>
+<img src="/img/VMware/VMware/开始安装.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>设置root用户密码</p>
+<img src="/img/VMware/VMware/设置root用户密码.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>创建普通用户</p>
+<img src="/img/VMware/VMware/创建普通用户.png" srcset="/img/loading.gif" lazyload style="zoom: 50%;" />
+</li>
+<li>
+<p>等待系统安装完成</p>
+<img src="/img/VMware/VMware/等待系统安装.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>安装完成后，重启系统</p>
+<img src="/img/VMware/VMware/重启操作系统.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>重启后，同意许可协议</p>
+<p><img src="/img/VMware/VMware/%E6%88%91%E5%90%8C%E6%84%8F%E5%8D%8F%E8%AE%AE.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+<li>
+<p>连接网络</p>
+<p><img src="/img/VMware/VMware/image-20250118100925374.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+</ol>
+<p><strong>注意：若网络连接不成功，可按照以下步骤解决。</strong></p>
+<ul>
+<li>
+<p>检查主机是否联网，因为桥接模式下，虚拟机直接连接到主机所连接的网络。</p>
+</li>
+<li>
+<p>配置虚拟网络编辑器</p>
+<ul>
+<li>
+<p>打开虚拟网络编辑器</p>
+<p><img src="/img/VMware/VMware/image-20250118101112292.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+<li>
+<p>点击<code>更改设置</code></p>
+<img src="/img/VMware/VMware/image-20250118101125031.png" srcset="/img/loading.gif" lazyload style="zoom:67%;" />
+</li>
+<li>
+<p>修改桥接模式网络配置，将虚拟机桥接到主机联网所使用的网卡。</p>
+<img src="/img/VMware/VMware/image-20250118101128959.png" srcset="/img/loading.gif" lazyload style="zoom:67%;" />
+</li>
+</ul>
+</li>
+</ul>
+<ol start="11">
+<li>
+<p>完成后，点击<code>完成配置</code></p>
+<p><img src="/img/VMware/VMware/image-20250118101139458.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+</ol>
+<p><strong>恭喜你已经成功拥有了属于自己并且配置完毕的虚拟机！</strong><br>
+<strong>但这个虚拟机目前仍存在一些网络问题的痛点，还需进一步配置</strong><br>
+参考文档：<a href="">【VMware】虚拟网络配置</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/VMware/" class="category-chain-item">VMware</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/VMware/" class="print-no-link">#VMware</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【VMware】创建自己的虚拟机并为其配置</div>
+      <div>https://laojiao1.github.io/2025/01/18/VMware/VMware/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月18日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2025/01/18/VMware/VMNet/" title="【VMware】虚拟网络配置">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">【VMware】虚拟网络配置</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/14/DeepLearning/YOLOv3/" title="【计算机视觉】YOLOv3 模型">
+                        <span class="hidden-mobile">【计算机视觉】YOLOv3 模型</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
