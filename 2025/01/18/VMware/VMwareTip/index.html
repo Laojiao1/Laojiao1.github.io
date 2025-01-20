@@ -19,24 +19,24 @@
   <meta name="author" content="Laojiao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="5倍经验日（01背包变形） 题目链接 思路： ​	当i &gt;&#x3D; use时，可以选择打败或者不打败 ​	f [i] &#x3D; max( f [i] + lose, f [i-use] + win )。 ​	当i &lt; use时，无法战胜对方。 ​	f [i] +&#x3D; lose ​	至于数据范围，最后输出时强制转换一下就行了。 1234567891011121314151617181920#inclu">
+    <meta name="description" content="【VMware】使用技巧 系统快照 所谓系统快照，就是将操作系统的当前状态保存下来，若将来系统出现不可修复的故障，便可使用快照恢复操作系统。下面演示VMware提供的快照功能。   拍摄快照 找到需要拍摄的虚拟机，执行如下操作  填写快照信息    误操作 假如失误删除了系统的一些重要文件，导致系统无法正常运行，例如下图所示  关机后再启动，发现无法进入系统。   恢复快照 进入快照管理器  选中">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【洛谷】5倍经验日——01背包变形">
-<meta property="og:url" content="https://laojiao1.github.io/2025/01/12/OJ/BagDP/P1082/index.html">
+<meta property="og:title" content="【VMware】使用技巧">
+<meta property="og:url" content="https://laojiao1.github.io/2025/01/18/VMware/VMwareTip/index.html">
 <meta property="og:site_name" content="Laojiao">
-<meta property="og:description" content="5倍经验日（01背包变形） 题目链接 思路： ​	当i &gt;&#x3D; use时，可以选择打败或者不打败 ​	f [i] &#x3D; max( f [i] + lose, f [i-use] + win )。 ​	当i &lt; use时，无法战胜对方。 ​	f [i] +&#x3D; lose ​	至于数据范围，最后输出时强制转换一下就行了。 1234567891011121314151617181920#inclu">
+<meta property="og:description" content="【VMware】使用技巧 系统快照 所谓系统快照，就是将操作系统的当前状态保存下来，若将来系统出现不可修复的故障，便可使用快照恢复操作系统。下面演示VMware提供的快照功能。   拍摄快照 找到需要拍摄的虚拟机，执行如下操作  填写快照信息    误操作 假如失误删除了系统的一些重要文件，导致系统无法正常运行，例如下图所示  关机后再启动，发现无法进入系统。   恢复快照 进入快照管理器  选中">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-01-12T13:08:00.000Z">
-<meta property="article:modified_time" content="2025-01-12T13:08:00.000Z">
+<meta property="og:image" content="https://laojiao1.github.io/img/others/VMware.png">
+<meta property="article:published_time" content="2025-01-18T02:23:55.447Z">
+<meta property="article:modified_time" content="2025-01-18T02:23:55.447Z">
 <meta property="article:author" content="Laojiao">
-<meta property="article:tag" content="OJ">
-<meta property="article:tag" content="算法">
-<meta property="article:tag" content="洛谷">
+<meta property="article:tag" content="VMware">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/others/VMware.png">
   
   
   
-  <title>【洛谷】5倍经验日——01背包变形 - Laojiao</title>
+  <title>【VMware】使用技巧 - Laojiao</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -235,7 +235,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="【洛谷】5倍经验日——01背包变形"></span>
+            <span id="subtitle" data-typed-text="【VMware】使用技巧"></span>
           
         </div>
 
@@ -246,8 +246,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-01-12 21:08" pubdate>
-          2025年1月12日 晚上
+        <time datetime="2025-01-18 10:23" pubdate>
+          2025年1月18日 上午
         </time>
       </span>
     
@@ -258,7 +258,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          182 字
+          395 字
         
       </span>
     
@@ -269,7 +269,7 @@
         
         
         
-          2 分钟
+          4 分钟
         
       </span>
     
@@ -306,20 +306,67 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">【洛谷】5倍经验日——01背包变形</h1>
+            <h1 id="seo-header">【VMware】使用技巧</h1>
             
             
               <div class="markdown-body">
                 
-                <h1>5倍经验日（01背包变形）</h1>
-<p><a target="_blank" rel="noopener" href="https://www.luogu.com.cn/problem/P1802">题目链接</a></p>
-<p><strong>思路：</strong></p>
-<p>​	当i &gt;= use时，可以选择打败或者不打败</p>
-<p>​	f [i] = max( f [i] + lose, f [i-use] + win )。</p>
-<p>​	当i &lt; use时，无法战胜对方。</p>
-<p>​	f [i] += lose</p>
-<p>​	至于数据范围，最后输出时强制转换一下就行了。</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;bits/stdc++.h&gt;</span></span><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-type">const</span> <span class="hljs-type">int</span> maxn = <span class="hljs-number">1100</span>;<br><span class="hljs-type">int</span> win[maxn], lose[maxn], use[maxn], f[maxn];<br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-type">int</span> n, x;<br>    <span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d %d&quot;</span>, &amp;n, &amp;x);<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++) &#123;<br>        <span class="hljs-built_in">scanf</span>(<span class="hljs-string">&quot;%d %d %d&quot;</span>, lose+i, win+i, use+i);<br>    &#125;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> i = <span class="hljs-number">1</span>; i &lt;= n; i++) &#123;<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> l = x; l &gt;= use[i]; l--)<br>            f[l] = <span class="hljs-built_in">max</span>(f[l]+lose[i], f[l-use[i]]+win[i]);<br>        <span class="hljs-keyword">for</span>(<span class="hljs-type">int</span> l = use[i]<span class="hljs-number">-1</span>; l &gt;= <span class="hljs-number">0</span>; l--) &#123;<br>            f[l] += lose[i];<br>        &#125;<br>    &#125;<br>    <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;%lld&quot;</span>, <span class="hljs-number">5</span>*f[x]);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+                <h1>【VMware】使用技巧</h1>
+<h2 id="系统快照">系统快照</h2>
+<p>所谓系统快照，就是将操作系统的当前状态保存下来，若将来系统出现不可修复的故障，便可使用快照恢复操作系统。下面演示VMware提供的快照功能。</p>
+<ol>
+<li>
+<p><strong>拍摄快照</strong></p>
+<p>找到需要拍摄的虚拟机，执行如下操作</p>
+<p><img src="/img/VMware/VMwareTip/%E6%8B%8D%E6%91%84%E5%BF%AB%E7%85%A7.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>填写快照信息</p>
+<img src="/img/VMware/VMwareTip/快照名称和描述.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p><strong>误操作</strong></p>
+<p>假如失误删除了系统的一些重要文件，导致系统无法正常运行，例如下图所示</p>
+<p><img src="/img/VMware/VMwareTip/%E8%AF%AF%E6%93%8D%E4%BD%9C.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>关机后再启动，发现无法进入系统。</p>
+</li>
+<li>
+<p><strong>恢复快照</strong></p>
+<p>进入快照管理器</p>
+<p><img src="/img/VMware/VMwareTip/%E5%BF%AB%E7%85%A7%E7%AE%A1%E7%90%86%E5%99%A8.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>选中要恢复的快照，点击<code>转到</code>，即可将系统恢复到指定的状态。</p>
+<img src="/img/VMware/VMwareTip/恢复快照.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p><strong>删除快照</strong></p>
+<p>若快照已经十分久远，失去其存在的意义，便可将其删除，具体操作如下图所示</p>
+<img src="/img/VMware/VMwareTip/删除快照.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+</ol>
+<h2 id="克隆虚拟机">克隆虚拟机</h2>
+<p>顾名思义，克隆虚拟机就是将现有的虚拟机复制一份，得到一台和原有虚拟机配置完全相同的虚拟机，从而省去重复安装系统的繁琐工作。克隆虚拟机的具体操作如下</p>
+<ol>
+<li>
+<p>将需要克隆的虚拟机关机</p>
+</li>
+<li>
+<p>选中要克隆的虚拟机，并打开克隆向导</p>
+<p><img src="/img/VMware/VMwareTip/%E6%89%93%E5%BC%80%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%90%91%E5%AF%BC.png" srcset="/img/loading.gif" lazyload alt=""></p>
+</li>
+<li>
+<p>选择克隆状态，可选最新状态或者快照中的历史状态</p>
+<img src="/img/VMware/VMwareTip/选择克隆状态.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>选择克隆方式，推荐选择<code>完整克隆</code></p>
+<img src="/img/VMware/VMwareTip/选择克隆方式.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+<li>
+<p>填写新虚拟机的名称和安装目录，最后点击完成</p>
+<img src="/img/VMware/VMwareTip/选择克隆位置.png" srcset="/img/loading.gif" lazyload style="zoom:80%;" />
+</li>
+</ol>
+<h2 id="删除虚拟机">删除虚拟机</h2>
+<p>废弃不用的虚拟机可通过如下方式删除</p>
+<p><img src="/img/VMware/VMwareTip/%E5%88%A0%E9%99%A4%E8%99%9A%E6%8B%9F%E6%9C%BA-1737167069945-11.png" srcset="/img/loading.gif" lazyload alt=""></p>
 
                 
               </div>
@@ -338,15 +385,8 @@
     
       <span class="category-chain">
         
-  <a href="/categories/OJ/" class="category-chain-item">OJ</a>
+  <a href="/categories/VMware/" class="category-chain-item">VMware</a>
   
-  
-    <span>></span>
-    
-  <a href="/categories/OJ/BagDP/" class="category-chain-item">BagDP</a>
-  
-  
-
   
 
       </span>
@@ -360,11 +400,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/OJ/" class="print-no-link">#OJ</a>
-      
-        <a href="/tags/%E7%AE%97%E6%B3%95/" class="print-no-link">#算法</a>
-      
-        <a href="/tags/%E6%B4%9B%E8%B0%B7/" class="print-no-link">#洛谷</a>
+        <a href="/tags/VMware/" class="print-no-link">#VMware</a>
       
     </div>
   
@@ -376,8 +412,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>【洛谷】5倍经验日——01背包变形</div>
-      <div>https://laojiao1.github.io/2025/01/12/OJ/BagDP/P1082/</div>
+      <div>【VMware】使用技巧</div>
+      <div>https://laojiao1.github.io/2025/01/18/VMware/VMwareTip/</div>
     </div>
     <div class="license-meta">
       
@@ -389,7 +425,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年1月12日</div>
+          <div>2025年1月18日</div>
         </div>
       
       
@@ -421,9 +457,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/13/DeepLearning/YOLO/" title="【计算机视觉】YOLO 算法简述">
+                      <a href="/2025/01/20/VMware/VMNet/" title="【VMware】虚拟网络配置">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">【计算机视觉】YOLO 算法简述</span>
+                        <span class="hidden-mobile">【VMware】虚拟网络配置</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -431,8 +467,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/12/OJ/BagDP/P1833/" title="【洛谷】樱花——混合背包">
-                        <span class="hidden-mobile">【洛谷】樱花——混合背包</span>
+                      <a href="/2025/01/17/algorithm/SqlEncryption/" title="【算法】AES-数据库加密算法">
+                        <span class="hidden-mobile">【算法】AES-数据库加密算法</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
