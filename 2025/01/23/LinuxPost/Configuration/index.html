@@ -1,0 +1,963 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="【Linux】在虚拟机上配置开发环境 1. 准备开发环境 为Linux虚拟机部署：MySQL、Redis、MinIO。 2. 准备Linux虚拟机 参考：【VMware】创建自己的虚拟机并为其配置 开发环境要求 一般情况下，开发阶段只需要一台虚拟机即可，另外一台留到后序的项目部署阶段使用。实际操作时，可先按要求准备一台，然后直接克隆得到第二台服务器。   操作系统为Centos7  由于下文的安装">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【Linux】在虚拟机上配置开发环境">
+<meta property="og:url" content="https://laojiao1.github.io/2025/01/23/LinuxPost/Configuration/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="【Linux】在虚拟机上配置开发环境 1. 准备开发环境 为Linux虚拟机部署：MySQL、Redis、MinIO。 2. 准备Linux虚拟机 参考：【VMware】创建自己的虚拟机并为其配置 开发环境要求 一般情况下，开发阶段只需要一台虚拟机即可，另外一台留到后序的项目部署阶段使用。实际操作时，可先按要求准备一台，然后直接克隆得到第二台服务器。   操作系统为Centos7  由于下文的安装">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/LinuxPost/bound.png">
+<meta property="article:published_time" content="2025-01-23T11:58:04.000Z">
+<meta property="article:modified_time" content="2025-01-23T11:58:04.000Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/LinuxPost/bound.png">
+  
+  
+  
+  <title>【Linux】在虚拟机上配置开发环境 - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【Linux】在虚拟机上配置开发环境"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-01-23 19:58" pubdate>
+          2025年1月23日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          16 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【Linux】在虚拟机上配置开发环境</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>【Linux】在虚拟机上配置开发环境</h1>
+<h2 id="1-准备开发环境">1. 准备开发环境</h2>
+<p>为Linux虚拟机部署：<strong>MySQL</strong>、<strong>Redis</strong>、<strong>MinIO</strong>。</p>
+<h2 id="2-准备Linux虚拟机">2. 准备Linux虚拟机</h2>
+<p>参考：<a href="https://laojiao1.github.io/2025/01/14/VMware/VMware/">【VMware】创建自己的虚拟机并为其配置</a></p>
+<h3 id="开发环境要求">开发环境要求</h3>
+<p>一般情况下，开发阶段只需要一台虚拟机即可，另外一台留到后序的项目部署阶段使用。实际操作时，可先按要求准备一台，然后直接克隆得到第二台服务器。</p>
+<ul>
+<li>
+<p><strong>操作系统为Centos7</strong></p>
+<blockquote>
+<p>由于下文的安装步骤都是基于Centos7系统的，所以建议统一使用Centos7系统。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>网络设置</strong></p>
+<blockquote>
+<p>虚拟机网络使用NAT模式，且使用静态IP。</p>
+</blockquote>
+</li>
+<li>
+<p><strong>主机名设置</strong></p>
+<p>为两台主机分别设置一个主机名，分别是<code>server01</code>和<code>server02</code>，设置主机名的命令如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">hostnamectl set-hostname &lt;主机名&gt; --static<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>配置好SSH远程登录</strong></p>
+<blockquote>
+<p>ssh客户端不限，可使用Xshell、MobaXterm、finalshell等等</p>
+</blockquote>
+</li>
+<li>
+<p><strong>与网络时间保持同步</strong></p>
+<p>安装时间同步工具<code>chrony</code>。</p>
+<ul>
+<li>
+<p>执行以下命令安装<code>chrony</code></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install chrony<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p>执行以下命令启动<code>chrony</code>，并设置为开机自启。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start chronyd<br>systemctl <span class="hljs-built_in">enable</span> chronyd<br></code></pre></td></tr></table></figure>
+<p><strong>知识点</strong></p>
+<ul>
+<li>
+<p><strong>查看时间源</strong></p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">chronyc sources</span><br></code></pre></td></tr></table></figure>
+<p>该命令显示结果如下</p>
+<figure class="highlight tap"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs tap">210 Number of sources = 4<br>MS Name/IP address         Stratum Poll Reach LastRx Last sample               <br>===============================================================================<br>^? ntp8.flashdance.cx           <span class="hljs-number"> 2 </span> <span class="hljs-number"> 6 </span>   <span class="hljs-number"> 3 </span>   <span class="hljs-number"> 0 </span>   +44ms[  +44ms] +/-   93ms<br>^? electrode.felixc.at          <span class="hljs-number"> 2 </span> <span class="hljs-number"> 6 </span>   <span class="hljs-number"> 5 </span>   <span class="hljs-number"> 0 </span>   +32ms[  +32ms] +/-  135ms<br>^* 81.16.177.123                <span class="hljs-number"> 2 </span> <span class="hljs-number"> 6 </span>   <span class="hljs-number"> 7 </span>   <span class="hljs-number"> 1 </span>  +457us[+28800s] +/-  149ms<br>^- dns2.synet.edu.cn            <span class="hljs-number"> 1 </span> <span class="hljs-number"> 6 </span>   <span class="hljs-number"> 7 </span>   <span class="hljs-number"> 2 </span>   +55ms[+28800s] +/-   28ms<br></code></pre></td></tr></table></figure>
+<ul>
+<li>MS：当前事件源的状态</li>
+<li>Name/IP：时间服务器地址</li>
+</ul>
+</li>
+<li>
+<p><strong>配置新的时间源</strong></p>
+<p>可修改<code>vim /etc/chrony.conf</code>以增加新的时间源</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>关闭防火墙</strong></p>
+<p>关闭命令如下</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#关闭防火墙 </span><br>systemctl stop firewalld<br><br><span class="hljs-comment">#禁止防火墙开机自启</span><br>systemctl <span class="hljs-built_in">disable</span> firewalld<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>关闭SElinux</strong></p>
+<p>SELinux，全称为Security-Enhanced Linux，是一种用于Linux操作系统的安全增强功能，为保证后序部署阶段的Nginx能够正常工作，此处关闭SELinux功能。</p>
+<ul>
+<li>
+<p><strong>修改SELinux配置文件</strong></p>
+<p>打开配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/selinux/config<br></code></pre></td></tr></table></figure>
+<p>修改内容如下</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">SELINUX</span>=disabled<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>重启操作系统</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">reboot<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="3-部署MySQL">3. 部署MySQL</h2>
+<p>在<code>server01</code>部署MySQL，具体步骤可<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/mysql-installation-excerpt/8.0/en/linux-installation-yum-repo.html">参考文档</a>。</p>
+<ol>
+<li>
+<p><strong>安装MySQL yum库</strong></p>
+<ul>
+<li>
+<p><strong>下载yum库</strong></p>
+<p>下载地址为<a target="_blank" rel="noopener" href="https://dev.mysql.com/downloads/repo/yum/%E3%80%82%E9%9C%80%E8%A6%81%E6%A0%B9%E6%8D%AE%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E9%80%89%E6%8B%A9%E7%9B%B8%E5%BA%94%E7%89%88%E6%9C%AC%EF%BC%8CCentos7%E9%9C%80%E9%80%89%E6%8B%A9%60mysql80-community-release-el7-9.noarch.rpm%60%E3%80%82">https://dev.mysql.com/downloads/repo/yum/。需要根据操作系统选择相应版本，Centos7需选择`mysql80-community-release-el7-9.noarch.rpm`。</a></p>
+<p>执行以下命令可直接下载到服务器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dev.mysql.com/get/mysql80-community-release-el7-9.noarch.rpm<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>安装yum库</strong></p>
+<p>在上述<code>rpm</code>文件所在路径执行如下命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rpm -ivh mysql80-community-release-el7-9.noarch.rpm<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>配置国内镜像</strong></p>
+<p>由于清华大学关于Centos7镜像网站的维护已于2024年6月停止，因此使用阿里云镜像</p>
+<p><strong>删除原有镜像</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">rm</span>  -f /etc/yum.repos.d/CentOS-Base.repo<br></code></pre></td></tr></table></figure>
+<p><strong>更新阿里云镜像</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget -O /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>安装MySQL</strong></p>
+<p>执行如下命令安装MySQL</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum install -y mysql-community-server<br></code></pre></td></tr></table></figure>
+<p><strong>如果安装过程中遇到密钥问题：使用如下命令进行安装</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> yum install mysql-server --nogpgcheck<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>启动MySQL</strong></p>
+<p>执行如下命令启动MySQL服务</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start mysqld<br></code></pre></td></tr></table></figure>
+<p>执行以下命令查看MySQL运行状态</p>
+  <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl status mysqld<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>root用户相关配置</strong></p>
+<ul>
+<li>
+<p><strong>查看root用户初始密码</strong></p>
+<p>MySQL启动后会将root用户的初始密码写入日志，通过以下命令可以获取密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /var/log/mysqld.log | grep password<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>使用初始密码登录</strong></p>
+<p>执行以下命令登录MySQL</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">mysql -uroot -p<span class="hljs-string">&#x27;password&#x27;</span><br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>修改root用户密码</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">ALTER USER <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;localhost&#x27;</span> IDENTIFIED BY <span class="hljs-string">&#x27;Jxmyyds.123&#x27;</span>;<br></code></pre></td></tr></table></figure>
+<p><strong>注意</strong>：MySQL默认安装了<a target="_blank" rel="noopener" href="https://dev.mysql.com/doc/refman/8.0/en/validate-password.html">validate_password</a> 插件，默认情况下，要求密码要包含大写字母、小写字母、数字和特殊符号，且密码长度最小为8。若需设置简单密码，可禁用该插件，或调整该插件的密码强度级别。</p>
+</li>
+<li>
+<p><strong>授予root用户远程登录权限</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">CREATE USER <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> IDENTIFIED BY <span class="hljs-string">&#x27;Atguigu.123&#x27;</span>;<br>GRANT ALL PRIVILEGES ON *.* TO <span class="hljs-string">&#x27;root&#x27;</span>@<span class="hljs-string">&#x27;%&#x27;</span> WITH GRANT OPTION;<br>FLUSH PRIVILEGES;<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ol>
+<h2 id="4-部署Redis">4. 部署Redis</h2>
+<p>在<code>server01</code>部署Redis服务，安装方式采用yum在线安装，安装版本为<code>redis-7.0.13</code>，具体步骤如下</p>
+<ol>
+<li>
+<p><strong>安装Redis yum仓库</strong></p>
+<ul>
+<li>
+<p><strong>下载yum仓库</strong></p>
+<p>Redis所在的仓库为<strong>remi-release</strong>，下载地址：<a target="_blank" rel="noopener" href="http://rpms.famillecollet.com/enterprise/remi-release-7.rpm">http://rpms.famillecollet.com/enterprise/remi-release-7.rpm</a><br>
+可使用如下命令直接下载到服务器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget http://rpms.famillecollet.com/enterprise/remi-release-7.rpm<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>安装yum仓库</strong></p>
+<p>执行如下命令进行安装</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rpm -ivh remi-release-7.rpm --force --nodeps<br></code></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>安装Reids</strong></p>
+<p>执行以下命令安装Redis</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yum --enablerepo=remi -y install redis-7.2.5<br></code></pre></td></tr></table></figure>
+<p>注：<code>--enablerepo</code>选项的作用为启用一个仓库</p>
+</li>
+<li>
+<p><strong>配置Redis允许远程访问</strong></p>
+<p>Redis服务默认只允许本地访问，若需要进行远程访问，需要做出以下配置。</p>
+<p>修改Redis配置文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/redis/redis.conf<br></code></pre></td></tr></table></figure>
+<p>修改如下参数</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-comment">#监听所有网络接口，默认只监听localhost</span><br>bind 0.0.0.0<br><br><span class="hljs-comment">#关闭保护模式，默认开启。开始保护模式后，远程访问必须进行认证后才能访问。</span><br>protected-mode no<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>启动Redis</strong></p>
+<p>执行以下命令启动Redis</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start redis<br></code></pre></td></tr></table></figure>
+<p>执行以下命令查看Redis的运行状态</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl status redis<br></code></pre></td></tr></table></figure>
+<p>执行以下命令设置Redis开机自启</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl <span class="hljs-built_in">enable</span> redis<br></code></pre></td></tr></table></figure>
+</li>
+</ol>
+<h2 id="5-部署MinIO">5. 部署MinIO</h2>
+<p>在<code>server01</code>部署MinIO，安装方式采用rpm离线安装，具体步骤可参考<a target="_blank" rel="noopener" href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html#minio-snsd">官方文档</a>。</p>
+<ol>
+<li>
+<p><strong>获取MinIO安装包</strong></p>
+<p>下载地址：<a target="_blank" rel="noopener" href="https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20230809233022.0.0.x86_64.rpm">https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20230809233022.0.0.x86_64.rpm</a><br>
+通过以下命令可直接将安装包下载至服务器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">wget https://dl.min.io/server/minio/release/linux-amd64/archive/minio-20230809233022.0.0.x86_64.rpm<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>安装MinIO</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">rpm -ivh minio-20230809233022.0.0.x86_64.rpm<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>集成Systemd</strong></p>
+<ul>
+<li>
+<p><strong>Systemd概述</strong></p>
+<p><code>Systemd</code>是一个广泛应用于Linux系统的系统初始化和服务管理器，其可以管理系统中的各种服务和进程，包括启动、停止和重启服务，除此之外，其还可以监测各服务的运行状态，并在服务异常退出时，自动拉起服务，以保证服务的稳定性。系统自带的防火墙服务<code>firewalld</code>，我们自己安装的<code>mysqld</code>和<code>redis</code>均是由<code>Systemd</code>进行管理的，此处将MinIO服务也交给Systemd管理。</p>
+</li>
+<li>
+<p><strong>编写MinIO服务配置文件</strong></p>
+<p>Systemd所管理的服务需要由一个配置文件进行描述，这些配置文件均位于<code>/etc/systemd/system/</code>或者<code>/usr/lib/systemd/system/</code>目录下，下面创建MinIO服务的配置文件。</p>
+<p>执行以下命令创建并打开<code>minio.service</code>文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/systemd/system/minio.service<br></code></pre></td></tr></table></figure>
+<p>内容如下，具体可参考MinIO<a target="_blank" rel="noopener" href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html#create-the-systemd-service-file">官方文档</a>。</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-section">[Unit]</span><br><span class="hljs-attr">Description</span>=MinIO<br><span class="hljs-attr">Documentation</span>=https://min.io/docs/minio/linux/index.html<br><span class="hljs-attr">Wants</span>=network-<span class="hljs-literal">on</span>line.target<br><span class="hljs-attr">After</span>=network-<span class="hljs-literal">on</span>line.target<br><span class="hljs-attr">AssertFileIsExecutable</span>=/usr/local/bin/minio<br><br><span class="hljs-section">[Service]</span><br><span class="hljs-attr">WorkingDirectory</span>=/usr/local<br><span class="hljs-attr">ProtectProc</span>=invisible<br><span class="hljs-attr">EnvironmentFile</span>=-/etc/default/minio<br><span class="hljs-attr">ExecStartPre</span>=/bin/bash -c <span class="hljs-string">&quot;if [ -z \&quot;$&#123;MINIO_VOLUMES&#125;\&quot; ]; then echo \&quot;Variable MINIO_VOLUMES not set in /etc/default/minio\&quot;; exit 1; fi&quot;</span><br><span class="hljs-attr">ExecStart</span>=/usr/local/bin/minio server <span class="hljs-variable">$MINIO_OPTS</span> <span class="hljs-variable">$MINIO_VOLUMES</span><br><span class="hljs-attr">Restart</span>=always<br><span class="hljs-attr">LimitNOFILE</span>=<span class="hljs-number">65536</span><br><span class="hljs-attr">TasksMax</span>=infinity<br><span class="hljs-attr">TimeoutStopSec</span>=infinity<br><span class="hljs-attr">SendSIGKILL</span>=<span class="hljs-literal">no</span><br><br><span class="hljs-section">[Install]</span><br><span class="hljs-attr">WantedBy</span>=multi-user.target<br></code></pre></td></tr></table></figure>
+<p><strong>注意</strong>：</p>
+<p>重点关注上述文件中的以下内容即可</p>
+<ul>
+<li><code>EnvironmentFile</code>，该文件中可配置MinIO服务所需的各项参数</li>
+<li><code>ExecStart</code>，该参数用于配置MinIO服务的启动命令，其中<code>$MINIO_OPTS</code>、<code>$MINIO_VOLUMES</code>，均引用于<code>EnvironmentFile</code>中的变量。
+<ul>
+<li><code>MINIO_OPTS</code>用于配置MinIO服务的启动选项，可省略不配置。</li>
+<li><code>MINIO_VOLUMES</code>用于配置MinIO服务的数据存储路径。</li>
+</ul>
+</li>
+<li><code>Restart</code>，表示自动重启</li>
+</ul>
+</li>
+<li>
+<p><strong>编写<code>EnvironmentFile</code>文件</strong></p>
+<p>执行以下命令创建并打开<code>/etc/default/minio</code>文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">vim /etc/default/minio<br></code></pre></td></tr></table></figure>
+<p>内容如下，具体可参考<a target="_blank" rel="noopener" href="https://min.io/docs/minio/linux/operations/install-deploy-manage/deploy-minio-single-node-single-drive.html#create-the-environment-variable-file">官方文档</a>。</p>
+<figure class="highlight ini"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs ini"><span class="hljs-attr">MINIO_ROOT_USER</span>=minioadmin<br><span class="hljs-attr">MINIO_ROOT_PASSWORD</span>=minioadmin<br><span class="hljs-attr">MINIO_VOLUMES</span>=/data<br><span class="hljs-attr">MINIO_OPTS</span>=<span class="hljs-string">&quot;--console-address :9001&quot;</span><br></code></pre></td></tr></table></figure>
+<p><strong>注意</strong></p>
+<ul>
+<li>
+<p><code>MINIO_ROOT_USER</code>和<code>MINIO_ROOT_PASSWORD</code>为用于访问MinIO的用户名和密码，<strong>密码长度至少8位</strong>。</p>
+</li>
+<li>
+<p><code>MINIO_VOLUMES</code>用于指定数据存储路径，需确保指定的路径是存在的，可执行以下命令创建该路径。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">mkdir</span> /data<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><code>MINIO_OPTS</code>中的<code>console-address</code>,用于指定管理页面的地址。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>启动MinIO</strong></p>
+<p>执行以下命令启动MinIO</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl start minio<br></code></pre></td></tr></table></figure>
+<p>执行以下命令查询运行状态</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl status minio<br></code></pre></td></tr></table></figure>
+<p>设置MinIO开机自启</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">systemctl <span class="hljs-built_in">enable</span> minio<br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>访问MinIO管理页面</strong></p>
+<p>管理页面的访问地址为：<code>http://192.168.10.101:9001</code><br>
+输入先前设置的用户名和密码，如果登陆成功，则配置完毕。</p>
+<p><strong>注意</strong>：<code>ip</code>需要根据实际情况做出修改</p>
+</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Linux/" class="category-chain-item">Linux</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Linux/" class="print-no-link">#Linux</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【Linux】在虚拟机上配置开发环境</div>
+      <div>https://laojiao1.github.io/2025/01/23/LinuxPost/Configuration/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年1月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2025/01/18/VMware/VMwareTip/" title="【VMware】使用技巧">
+                        <span class="hidden-mobile">【VMware】使用技巧</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
