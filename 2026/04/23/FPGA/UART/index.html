@@ -19,24 +19,25 @@
   <meta name="author" content="Laojiao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="1. Google SEO——从搜索引擎优化中获得更多免费流量 一、什么是Google SEO？ SEO是搜索引擎优化的缩写，Google SEO就是针对Google的搜索引擎优化。 是在符合Google优化规则的前提下对网站进行一系列的设置和优化，让网站获得更好的搜索排名，从而获得更多的免费流量。 二、为什么SEO很重要？ 每天都有很多人通过Google搜索找到自己需要的东西，而我们做SEO优化">
+    <meta name="description" content="串口收发实验 串口通信就像是两个人隔着一条很细的管子在传纸条，因为管子太细，每次只能传一个字（一个比特，Bit），所以需要双方约定好传输的“节奏”和“格式”。 第一步：认识串口（UART）是什么？ 全称：UART（通用异步接收&#x2F;发送）。 大白话：它是一个把“并行数据”（一排同时发出的数据）变成“串行数据”（排好队一个一个发出的数据）的机制 。 物理接口：你的开发板上用的是 USB 转串口芯片（CP">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【Google SEO】Google SEO 初探">
-<meta property="og:url" content="https://laojiao1.github.io/2026/04/12/SEO/SeoExplore/index.html">
+<meta property="og:title" content="串口收发实验">
+<meta property="og:url" content="https://laojiao1.github.io/2026/04/23/FPGA/UART/index.html">
 <meta property="og:site_name" content="Laojiao">
-<meta property="og:description" content="1. Google SEO——从搜索引擎优化中获得更多免费流量 一、什么是Google SEO？ SEO是搜索引擎优化的缩写，Google SEO就是针对Google的搜索引擎优化。 是在符合Google优化规则的前提下对网站进行一系列的设置和优化，让网站获得更好的搜索排名，从而获得更多的免费流量。 二、为什么SEO很重要？ 每天都有很多人通过Google搜索找到自己需要的东西，而我们做SEO优化">
+<meta property="og:description" content="串口收发实验 串口通信就像是两个人隔着一条很细的管子在传纸条，因为管子太细，每次只能传一个字（一个比特，Bit），所以需要双方约定好传输的“节奏”和“格式”。 第一步：认识串口（UART）是什么？ 全称：UART（通用异步接收&#x2F;发送）。 大白话：它是一个把“并行数据”（一排同时发出的数据）变成“串行数据”（排好队一个一个发出的数据）的机制 。 物理接口：你的开发板上用的是 USB 转串口芯片（CP">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://laojiao1.github.io/img/SEO/bound.png">
-<meta property="article:published_time" content="2026-04-12T08:57:14.037Z">
-<meta property="article:modified_time" content="2026-04-12T08:57:14.037Z">
+<meta property="og:image" content="https://laojiao1.github.io/img/FPGA/FPGA.jpg">
+<meta property="article:published_time" content="2026-04-23T01:51:19.118Z">
+<meta property="article:modified_time" content="2026-04-23T01:51:19.118Z">
 <meta property="article:author" content="Laojiao">
-<meta property="article:tag" content="Google SEO">
+<meta property="article:tag" content="FPGA">
+<meta property="article:tag" content="硬件">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://laojiao1.github.io/img/SEO/bound.png">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/FPGA/FPGA.jpg">
   
   
   
-  <title>【Google SEO】Google SEO 初探 - Laojiao</title>
+  <title>串口收发实验 - Laojiao</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -235,7 +236,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="【Google SEO】Google SEO 初探"></span>
+            <span id="subtitle" data-typed-text="串口收发实验"></span>
           
         </div>
 
@@ -246,8 +247,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-04-12 16:57" pubdate>
-          2026年4月12日 下午
+        <time datetime="2026-04-23 09:51" pubdate>
+          2026年4月23日 上午
         </time>
       </span>
     
@@ -258,7 +259,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.5k 字
+          882 字
         
       </span>
     
@@ -269,7 +270,7 @@
         
         
         
-          13 分钟
+          8 分钟
         
       </span>
     
@@ -306,69 +307,52 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">【Google SEO】Google SEO 初探</h1>
+            <h1 id="seo-header">串口收发实验</h1>
             
             
               <div class="markdown-body">
                 
-                <h1>1. Google SEO——从搜索引擎优化中获得更多免费流量</h1>
-<h2 id="一、什么是Google-SEO？">一、什么是Google SEO？</h2>
-<p>SEO是搜索引擎优化的缩写，Google SEO就是针对Google的搜索引擎优化。</p>
-<p>是在符合Google优化规则的前提下对网站进行一系列的设置和优化，让网站获得更好的搜索排名，从而获得更多的免费流量。</p>
-<h2 id="二、为什么SEO很重要？">二、为什么SEO很重要？</h2>
-<p>每天都有很多人通过Google搜索找到自己需要的东西，而我们做SEO优化就是为了获得更好的搜索排名，从而让更多潜在用户访问你的网站，进而产生成交，带来收益。</p>
-<h2 id="三、如何做SEO？">三、如何做SEO？</h2>
-<p>Google的建议是你应该搭建一个对用户有用的网站，任何优化都是用于改善用户体验。简单理解就是以用户体验为首位，发布有价值的文章内容，文章的标题和内容部分包含有意义的搜索关键词。</p>
-<p>PS：<a target="_blank" rel="noopener" href="https://www.by928.com/guizhou/502.html">外贸网站SEO不是给钱就能成的</a></p>
-<h3 id="第一步：关键词研究">第一步：关键词研究</h3>
-<p><strong>关键词</strong>，英文名叫<strong>Keywords</strong>，简单来说就是你这个网站希望别人通过什么词语搜索到你。</p>
-<p>选取关键词是第一步也是最重要的一步。如果选错了关键词，那么在整个SEO过程中都会走很多的弯路。假如最开始的定位并非做现在的内容，就会导致定位更换几次，如果关键词没定好，内容规划起来就很麻烦。</p>
-<p>很多外贸网站在设置标题时，仅仅使用公司名称，或者干脆不设置标题，这样做不利于SEO优化。除非你是全球知名品牌，否则很少有人会通过你的品牌名来寻找你的网站。为了提升曝光率和流量，你的标题应该<strong>包含与你的产品和服务相关的关键词</strong>。比如，你可以将标题设置为：“XXX – 手机配件批发, 手机壳, 数据线, 手机充电器制造商”。这样，潜在客户在搜索“手机配件”、“手机壳”、“数据线”或“手机充电器制造商”等相关关键词时，就有更高的机会找到你的网站，提升网站的可见性和搜索排名。</p>
-<h3 id="第二步：编写友好内容">第二步：编写友好内容</h3>
-<p>简单来说就是站在用户的角度来写文章，确保内容不仅对搜索引擎有利，更能解决用户的实际问题，提升用户体验。</p>
-<p>例如，香水网站在编写文章时，想着的就是提供香水选购的全面指南，同时也有人搜索“男士香水推荐”、“女士香水品牌”、“香水购买指南”等词汇，因此你看到的这个页面标题叫“香水购买指南_ 男士香水推荐 _女士香水品牌推荐 | 香水之家”。</p>
-<p>满足SEO基本要求：</p>
+                <h1>串口收发实验</h1>
+<p>串口通信就像是<strong>两个人隔着一条很细的管子在传纸条</strong>，因为管子太细，每次只能传一个字（一个比特，Bit），所以需要双方约定好传输的“节奏”和“格式”。</p>
+<h3 id="第一步：认识串口（UART）是什么？">第一步：认识串口（UART）是什么？</h3>
+<p><strong>全称</strong>：UART（通用异步接收/发送）。</p>
+<p><strong>大白话</strong>：它是一个把“并行数据”（一排同时发出的数据）变成“串行数据”（排好队一个一个发出的数据）的机制 。</p>
+<p><strong>物理接口</strong>：你的开发板上用的是 USB 转串口芯片（CP2102） 。因为现在的电脑基本没有老式的九针串口了，所以用这颗芯片把 USB 信号转换成 FPGA 能懂的 TTL 电平信号（高低电平） 。</p>
+<h3 id="第二步：数据的“包装”规则（通信协议）">第二步：数据的“包装”规则（通信协议）</h3>
+<p>既然只能一根线单向传数据（发一根线TX，收一根线RX），怎么知道什么时候开始传，什么时候结束呢？这就需要“包装” ：</p>
 <ol>
-<li>内容满足用户需要</li>
-<li>内容有价值</li>
+<li><strong>空闲状态</strong>：当没有数据传的时候，线上的电压一直保持<strong>高电平</strong> 。</li>
+<li><strong>起始位</strong>：发送方突然把电平拉<strong>低</strong>。接收方一看到电平掉下来了，就知道：“注意！有人要发数据了！”</li>
+<li><strong>数据位</strong>：紧接着发送 8 个位（Bit）的真实数据，先发最低位（LSB），最后发最高位（MSB） 。</li>
+<li><strong>停止位</strong>：数据发完后，强行拉<strong>高</strong>电平，表示这包数据传完了 。</li>
 </ol>
-<p>内容优化还有很多细节要做，例如标题标签优化，Meta描述优化，URL优化，内容优化，内部链接，移动端优化等等可以操作的地方。</p>
-<h3 id="第三步：内部链接优化">第三步：内部链接优化</h3>
-<p><img src="/img/SEO/%E5%86%85%E9%93%BE%E5%9B%BE.png" srcset="/img/loading.gif" lazyload alt="内链"></p>
-<p>如上图，把网站的文章页面串联起来。</p>
-<p>简单来说，就是那些在文本里可以点击的链接，点进去同样是该网站下的文章或者页面，这就是内链。</p>
-<p>内链建设时要保证顺其自然，不要刻意添加，否则会导致网页结构紊乱，劝退用户的阅读意愿。应该是文章写到那个地方，在合适的地方添加一个对用户有帮助的链接。</p>
-<h3 id="第四步：外部链接建设">第四步：外部链接建设</h3>
-<p>SEO界有一句俗话——“内容为王，外链为皇”，所谓外部链接就是其他网站指向你网站的链接。</p>
-<p>作为商业网站，外联是提高网站可信度和排名的关键因素。</p>
-<p>具体来说有以下几种方式（其实就是蹭流量）：</p>
 <ul>
-<li>
-<p><strong>获得高质量的外部链接</strong>：从相关领域的网站或博客获取高质量的反向链接。</p>
-</li>
-<li>
-<p><strong>客座博客</strong>：写一些与自己业务相关的文章，发布在其他高流量网站或博客上，获得链接。</p>
-</li>
-<li>
-<p><strong>社交媒体</strong>：通过社交媒体渠道吸引流量，提升品牌曝光，并间接影响SEO。</p>
+<li><strong>波特率（Baud Rate）</strong>：就是双方约定好的“语速” 。文档中用的是 115200 。意思是 1 秒钟最多能传 115200 个位 。如果双方语速没对上，听到的就会是乱码 。</li>
+</ul>
+<h3 id="第三步：接收数据的核心——状态机（RX）">第三步：接收数据的核心——状态机（RX）</h3>
+<p>FPGA 怎么去抓这些转瞬即逝的高低电平呢？文档里用了一个非常经典的<strong>状态机（State Machine）</strong> 。你可以把它想象成一个按照固定剧本演出的机器人：</p>
+<ul>
+<li><strong>S_IDLE（空闲）</strong>：一直在死等。只要检测到接收引脚（rx_pin）出现下降沿（从高变低），立刻切换到下一个状态 。</li>
+<li><strong>S_START（起始）</strong>：确认这是起始位，等待一个波特率周期的时间 。</li>
+<li><strong>S_REC_BYTE（接收数据）</strong>：开始收数据！<strong>这里有一个非常重要的细节</strong>：为了防止信号刚变化时不稳定，代码设计在每个数据位时间的<strong>正中间</strong>去采样（读取）电平状态 。收满 8 个位后进入下一状态。</li>
+<li><strong>S_STOP（停止）</strong>：接收停止位。文档里提到，这里只等了半个周期就走了，是为了防止错过下一个紧接着发来的数据 。</li>
+<li><strong>S_DATA（数据输出）</strong>：把组合好的完整字节送给 FPGA 内部的其他模块 。</li>
+</ul>
+<h3 id="第四步：发送数据模块（TX）">第四步：发送数据模块（TX）</h3>
+<p>发送模块的逻辑和接收是完全对称的 。</p>
+<ul>
+<li><strong>S_IDLE</strong> -&gt; <strong>S_START</strong> -&gt; <strong>S_SEND_BYTE</strong> -&gt; <strong>S_STOP</strong> 。 它不需要找中间点采样，只要按照约定的波特率时间，把寄存器里存的数据，一位一位地扔到发送引脚（tx_pin）上就可以了 。</li>
+</ul>
+<h3 id="第五步：顶层测试程序">第五步：顶层测试程序</h3>
+<p>写好了发信员（TX）和收信员（RX），文档最后写了一个测试程序把它们连起来 。</p>
+<ul>
+<li><strong>它干了两件事</strong>：
+<ol>
+<li>每隔 1 秒钟，主动向电脑发送一句 <code>&quot;HELLO ALINX\r\n&quot;</code>（带回车换行） 。</li>
+<li>如果在这期间，电脑通过串口调试助手发了数据给 FPGA，FPGA 会立刻原封不动地把它再发回给电脑（这叫数据回环测试） 。</li>
+</ol>
 </li>
 </ul>
-<p>但有一点一定要注意：<strong>不要花钱买低质量外链！</strong></p>
-<h2 id="四、Google-SEO优化工具">四、Google SEO优化工具</h2>
-<p>一些很好用的工具可以来帮助我们更加高效的进行SEO工作，提升可行度。</p>
-<h4 id="Google-Search-Console"><a target="_blank" rel="noopener" href="https://developers.google.cn/search/docs/monitor-debug/search-console-start?hl=zh-cn">Google Search Console</a></h4>
-<p>Google Search Console又称谷歌搜索控制台、谷歌管理员工具、谷歌站长工具，是Google官方推出的站点管理工具，<strong>如果Google的搜索蜘蛛发现你网站有任何问题了，就会通知你</strong>。你也可以在上面看到很多网站在Google上面的数据。</p>
-<h4 id="Google-Analytics"><a target="_blank" rel="noopener" href="https://developers.google.cn/analytics?hl=zh-cn">Google Analytics</a></h4>
-<p><strong>Google Analytics</strong> 是一款由 Google 提供的免费网页分析工具，<strong>添加到网站后可以告诉你网站每天的流量信息</strong>。</p>
-<p><strong>主要功能：</strong></p>
-<ol>
-<li><strong>访问量分析</strong>：查看网站的访问次数、页面浏览量、访客来源等。</li>
-<li><strong>用户行为追踪</strong>：分析用户在网站上的行为，如浏览的页面、停留时间、跳出率等。</li>
-<li><strong>流量来源</strong>：分析访客是通过搜索引擎、社交媒体、广告还是直接访问来到网站。</li>
-<li><strong>受众分析</strong>：查看访客的地理位置、设备、浏览器等信息，帮助你优化用户体验。</li>
-</ol>
-<p>这些数据可以用来分析网站的用户访问情况，然后进行对应的SEO调整，是很重要的一项工作。</p>
-<p>当然，SEO工具只是辅助，关键还是网站内容和基础的SEO优化。</p>
 
                 
               </div>
@@ -387,7 +371,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/Google-SEO/" class="category-chain-item">Google SEO</a>
+  <a href="/categories/FPGA/" class="category-chain-item">FPGA</a>
   
   
 
@@ -402,7 +386,9 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Google-SEO/" class="print-no-link">#Google SEO</a>
+        <a href="/tags/FPGA/" class="print-no-link">#FPGA</a>
+      
+        <a href="/tags/%E7%A1%AC%E4%BB%B6/" class="print-no-link">#硬件</a>
       
     </div>
   
@@ -414,8 +400,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>【Google SEO】Google SEO 初探</div>
-      <div>https://laojiao1.github.io/2026/04/12/SEO/SeoExplore/</div>
+      <div>串口收发实验</div>
+      <div>https://laojiao1.github.io/2026/04/23/FPGA/UART/</div>
     </div>
     <div class="license-meta">
       
@@ -427,7 +413,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年4月12日</div>
+          <div>2026年4月23日</div>
         </div>
       
       
@@ -459,18 +445,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2026/04/23/FPGA/DDR/" title="DDR 读写测试实验">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">DDR 读写测试实验</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2026/04/12/SEO/GoogleSearch/" title="【Google SEO】Google抓取网页流程和搜索算法">
-                        <span class="hidden-mobile">【Google SEO】Google抓取网页流程和搜索算法</span>
+                      <a href="/2026/04/23/FPGA/PTP/" title="PTP 协议">
+                        <span class="hidden-mobile">PTP 协议</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
