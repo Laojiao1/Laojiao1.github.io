@@ -1,0 +1,816 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="神经网络量化 —— Scale 注入模型实战 在工业界（尤其是对接 TensorRT、SNPE 等后端时），直接导出一个带有 Q&#x2F;DQ（QuantizeLinear &#x2F; DequantizeLinear） 节点的 ONNX 模型是最标准的做法。 这样可以把我们在 Python 侧精心校准好的 Scale 和 Zero-Point 强行固化在模型结构里，不给推理引擎任何胡乱解释的机会。 今天我们用一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="【深度学习】神经网络量化 —— Scale 注入模型实战">
+<meta property="og:url" content="https://laojiao1.github.io/2026/05/30/Compiler/Quantification4/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="神经网络量化 —— Scale 注入模型实战 在工业界（尤其是对接 TensorRT、SNPE 等后端时），直接导出一个带有 Q&#x2F;DQ（QuantizeLinear &#x2F; DequantizeLinear） 节点的 ONNX 模型是最标准的做法。 这样可以把我们在 Python 侧精心校准好的 Scale 和 Zero-Point 强行固化在模型结构里，不给推理引擎任何胡乱解释的机会。 今天我们用一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Quantization/Quantization.png">
+<meta property="article:published_time" content="2026-05-30T02:32:03.831Z">
+<meta property="article:modified_time" content="2026-05-30T02:32:03.831Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="量化">
+<meta property="article:tag" content="编译器">
+<meta property="article:tag" content="软硬结合">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/DeepLearning/Quantization/Quantization.png">
+  
+  
+  
+  <title>【深度学习】神经网络量化 —— Scale 注入模型实战 - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="【深度学习】神经网络量化 —— Scale 注入模型实战"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-05-30 10:32" pubdate>
+          2026年5月30日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          28 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">【深度学习】神经网络量化 —— Scale 注入模型实战</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>神经网络量化 —— Scale 注入模型实战</h1>
+<p>在工业界（尤其是对接 TensorRT、SNPE 等后端时），直接导出一个带有 <strong>Q/DQ（QuantizeLinear / DequantizeLinear）</strong> 节点的 ONNX 模型是最标准的做法。</p>
+<p>这样可以把我们在 Python 侧精心校准好的 <code>Scale</code> 和 <code>Zero-Point</code> <strong>强行固化</strong>在模型结构里，不给推理引擎任何胡乱解释的机会。</p>
+<p>今天我们用一个最干净、最闭环的实战代码，来实现这个完整的流水线</p>
+<h2 id="实战目标">实战目标</h2>
+<ol>
+<li>构建一个包含 <code>Conv2d</code> 和 <code>ReLU</code> 的简单浮点模型。</li>
+<li>模拟前向传播，利用白盒方式拿到这一层的最佳 <code>Scale</code>（这里直接用我们上一关算出的黄金 Scale）。</li>
+<li>使用 <strong>PyTorch 2.0+ 推荐的白盒量化工具（<code>torch.ao.quantization</code>）</strong> 或是 <strong>ONNX 官方工具链</strong>，显式地将 Q/DQ 节点“拍”进网络。</li>
+<li>导出 ONNX 并教你如何用 <strong>Netron</strong> 检查它。</li>
+</ol>
+<h2 id="完整实战代码">完整实战代码</h2>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">import</span> torch<br><span class="hljs-keyword">import</span> torch.nn <span class="hljs-keyword">as</span> nn<br><span class="hljs-keyword">import</span> onnx<br><span class="hljs-keyword">from</span> onnx <span class="hljs-keyword">import</span> numpy_helper<br><span class="hljs-keyword">import</span> os<br><br><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-comment"># 1. 手写 Q/DQ 模拟仿真层</span><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">WhiteBoxFakeQuantize</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, init_scale=<span class="hljs-number">1.0</span>, init_zp=<span class="hljs-number">0</span></span>):<br>        <span class="hljs-built_in">super</span>(WhiteBoxFakeQuantize, <span class="hljs-variable language_">self</span>).__init__()<br>        <span class="hljs-comment"># 把 scale 和 zero_point 注册为 Buffer（它会作为常量一块导出到 ONNX 里）</span><br>        <span class="hljs-variable language_">self</span>.register_buffer(<span class="hljs-string">&#x27;scale&#x27;</span>, torch.tensor([init_scale], dtype=torch.float32))<br>        <span class="hljs-variable language_">self</span>.register_buffer(<span class="hljs-string">&#x27;zero_point&#x27;</span>, torch.tensor([init_zp], dtype=torch.int32))<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-comment"># 严格执行你笔记里的核心公式：q = round(x/S) + Z</span><br>        q = torch.<span class="hljs-built_in">round</span>(x / <span class="hljs-variable language_">self</span>.scale) + <span class="hljs-variable language_">self</span>.zero_point<br>        q = torch.clamp(q, -<span class="hljs-number">128</span>, <span class="hljs-number">127</span>)  <span class="hljs-comment"># 强行限制到 INT8 范围</span><br><br>        <span class="hljs-comment"># 反量化回去：dq = (q - Z) * S</span><br>        dq = (q - <span class="hljs-variable language_">self</span>.zero_point) * <span class="hljs-variable language_">self</span>.scale<br>        <span class="hljs-keyword">return</span> dq<br><br><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-comment"># 2. 构建完全由白盒量化包裹的最终部署模型</span><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">QuantizedDeployModel</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-built_in">super</span>(QuantizedDeployModel, <span class="hljs-variable language_">self</span>).__init__()<br>        <span class="hljs-variable language_">self</span>.conv = nn.Conv2d(in_channels=<span class="hljs-number">3</span>, out_channels=<span class="hljs-number">16</span>, kernel_size=<span class="hljs-number">3</span>, padding=<span class="hljs-number">1</span>)<br>        <span class="hljs-variable language_">self</span>.relu = nn.ReLU()<br><br>        <span class="hljs-comment"># 显式创建属于我们自己的量化激活节点</span><br>        <span class="hljs-comment"># 初始给个默认值，一会我们直接用 Python 属性修改它们</span><br>        <span class="hljs-variable language_">self</span>.input_quant = WhiteBoxFakeQuantize()<br>        <span class="hljs-variable language_">self</span>.weight_quant = WhiteBoxFakeQuantize()<br>        <span class="hljs-variable language_">self</span>.output_quant = WhiteBoxFakeQuantize()<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-comment"># 输入量化</span><br>        x = <span class="hljs-variable language_">self</span>.input_quant(x)<br><br>        <span class="hljs-comment"># 权重伪量化后再送入卷积</span><br>        faked_weight = <span class="hljs-variable language_">self</span>.weight_quant(<span class="hljs-variable language_">self</span>.conv.weight)<br>        x = nn.functional.conv2d(x, faked_weight, <span class="hljs-variable language_">self</span>.conv.bias,<br>                                 stride=<span class="hljs-variable language_">self</span>.conv.stride, padding=<span class="hljs-variable language_">self</span>.conv.padding)<br><br>        <span class="hljs-comment"># 激活层</span><br>        x = <span class="hljs-variable language_">self</span>.relu(x)<br><br>        <span class="hljs-comment"># 输出量化</span><br>        x = <span class="hljs-variable language_">self</span>.output_quant(x)<br>        <span class="hljs-keyword">return</span> x<br><br><br><span class="hljs-comment"># 实例化模型</span><br>deploy_model = QuantizedDeployModel()<br>deploy_model.<span class="hljs-built_in">eval</span>()<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;1. 显式白盒量化模型架构构建成功。&quot;</span>)<br><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-comment"># 3. 将校准参数写入对应的节点</span><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-comment"># 这里为了便于理解：假设通过你的高级算法算出来的黄金参数如下：</span><br>deploy_model.input_quant.scale.copy_(torch.tensor([<span class="hljs-number">0.007812</span>]))  <span class="hljs-comment"># 输入层的 Scale</span><br>deploy_model.weight_quant.scale.copy_(torch.tensor([<span class="hljs-number">0.004567</span>]))  <span class="hljs-comment"># 权重的 Scale</span><br>deploy_model.output_quant.scale.copy_(torch.tensor([<span class="hljs-number">0.012345</span>]))  <span class="hljs-comment"># 输出激活值的 Scale</span><br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;2. 黄金校准参数已成功拍入内存模型。&quot;</span>)<br><br><span class="hljs-comment"># =====================================================================</span><br><span class="hljs-comment"># 4. 纯净导出 ONNX </span><br><span class="hljs-comment"># =====================================================================</span><br>dummy_input = torch.randn(<span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">224</span>, <span class="hljs-number">224</span>)<br>onnx_path = <span class="hljs-string">&quot;onnx/qdq_whitebox_model.onnx&quot;</span><br><br>torch.onnx.export(<br>    deploy_model,<br>    dummy_input,<br>    onnx_path,<br>    input_names=[<span class="hljs-string">&quot;input&quot;</span>],<br>    output_names=[<span class="hljs-string">&quot;output&quot;</span>],<br>    opset_version=<span class="hljs-number">13</span><br>)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;3. Q/DQ ONNX 模型已成功导出至: <span class="hljs-subst">&#123;os.path.abspath(onnx_path)&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h2 id="算子图结果分析">算子图结果分析</h2>
+<p>代码运行完后，会在当前目录下生成一个 <code>qdq_fused_model.onnx</code> 文件。</p>
+<p>这时候我们需要用可视化工具 <strong>Netron</strong> 来做最后的一线确认。</p>
+<p><strong>检查步骤：</strong></p>
+<ol>
+<li>用浏览器打开 <a target="_blank" rel="noopener" href="https://netron.app/">netron.app</a>。</li>
+<li>把生成的 <code>qdq_fused_model.onnx</code> 文件拖进去。</li>
+<li>观察结构：你会发现原来的 <code>Conv</code> 和 <code>ReLU</code> 已经被完美合并了，而在它的<strong>输入端</strong>和<strong>权重端</strong>，多出了两个名字叫 <strong><code>QuantizeLinear</code></strong> 和 <strong><code>DequantizeLinear</code></strong> 的节点。</li>
+<li>确认参数对齐：点击其中一个 <code>QuantizeLinear</code> 节点，查看右侧的属性栏（Properties）</li>
+</ol>
+<p><strong>此代码生成的 ONNX 算子计算图如下：</strong></p>
+<img src="assets/qdq_whitebox_model.onnx.png" srcset="/img/loading.gif" lazyload alt="qdq_whitebox_model.onnx" style="zoom: 67%;" />
+<p>我们以最上方的 <strong><code>input</code>（输入激活值量化）</strong> 流水线为例，看看这一串算子是如何严丝合缝地执行量化公式的：</p>
+<p>总的来说，这张图可以分成三大核心区来拆解：<strong>左侧输入量化区、右侧权重量化区，以及中下部的激活量化与输出区。</strong></p>
+<h3 id="左侧输入量化（激活值-Fake-Quantize）">左侧输入量化（激活值 Fake Quantize）</h3>
+<p>从最上方的 <code>input</code> 开始，数据向下流动。原本在浮点模型里，<code>input</code> 应该直接连到 <code>Conv</code>（卷积）算子上。但现在，中间被强行插入了一套<strong>由 6 个算子组成的“伪量化组件”</strong>：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xl">[<span class="hljs-function"><span class="hljs-title">input</span>] -&gt;</span> D<span class="hljs-function"><span class="hljs-title">iv</span> -&gt;</span> R<span class="hljs-function"><span class="hljs-title">ound</span> -&gt;</span> A<span class="hljs-function"><span class="hljs-title">dd</span> -&gt;</span> C<span class="hljs-function"><span class="hljs-title">lip</span> -&gt;</span> S<span class="hljs-function"><span class="hljs-title">ub</span> -&gt;</span> M<span class="hljs-function"><span class="hljs-title">ul</span> -&gt;</span> [进入 Conv] <br></code></pre></td></tr></table></figure>
+<p>这 6 个算子分为两半，完美对应了量化与反量化数学公式</p>
+<h4 id="1-前半段（量化）：Div-Round-Add-Clip">1. 前半段（量化）：<code>Div</code> -&gt; <code>Round</code> -&gt; <code>Add</code> -&gt; <code>Clip</code></h4>
+<p>这四个算子在执行：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>q</mi><mo>=</mo><mtext>clamp</mtext><mo stretchy="false">(</mo><mtext>round</mtext><mo stretchy="false">(</mo><mi>x</mi><mi mathvariant="normal">/</mi><mi>S</mi><mo stretchy="false">)</mo><mo>+</mo><mi>Z</mi><mo separator="true">,</mo><mo>−</mo><mn>128</mn><mo separator="true">,</mo><mn>127</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">q = \text{clamp}(\text{round}(x / S) + Z, -128, 127)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">clamp</span></span><span class="mopen">(</span><span class="mord text"><span class="mord">round</span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">−</span><span class="mord">128</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">127</span><span class="mclose">)</span></span></span></span></p>
+<ul>
+<li><strong><code>Div</code> (除法)</strong>：输入的浮点张量（<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>x</mi></mrow><annotation encoding="application/x-tex">x</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>）在这里除以 <code>B &lt;1&gt;</code>（也就是你算出来的输入 <code>scale = 0.007812</code>）。</li>
+<li><strong><code>Round</code> (四舍五入)</strong>：将缩放后的浮点数就近舍入到最接近的整数。</li>
+<li><strong><code>Add</code> (加法)</strong>：加上零点 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi></mrow><annotation encoding="application/x-tex">Z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span></span></span></span>（因为是对称量化，这里的 <code>B &lt;1&gt;</code> 常量值为 0，加 0 后数值不变）。</li>
+<li><strong><code>Clip</code> (截断)</strong>：图上清清楚楚写着 <code>min = -128, max = 127</code>。凡是超出这个范围的离群值（Outliers），都会被在这里硬生生“砍一刀”，按死在边界上，防止硬件计算溢出。</li>
+<li><strong>至此，数据在概念上变成了真正的 INT8 整数。</strong></li>
+</ul>
+<h4 id="2-后半段（反量化）：Sub-Mul">2. 后半段（反量化）：<code>Sub</code> -&gt; <code>Mul</code></h4>
+<p>这两个算子在执行：<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>r</mi><mo>=</mo><mo stretchy="false">(</mo><mi>q</mi><mo>−</mo><mi>Z</mi><mo stretchy="false">)</mo><mo>×</mo><mi>S</mi></mrow><annotation encoding="application/x-tex">r = (q - Z) \times S</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></p>
+<ul>
+<li><strong><code>Sub</code> (减法)</strong>：减去零点 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Z</mi></mrow><annotation encoding="application/x-tex">Z</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">Z</span></span></span></span>（值仍为 0）。这里有一个有意思的细节，你注意到 <code>Sub</code> 的左边分叉连着一个 <code>Identity</code> 节点了吗？因为在代码中零点被强行初始化并广播成了 Tensor，<code>Identity</code> 只是一个占位标识，确保算子输入流的拓扑结构完整。</li>
+<li><strong><code>Mul</code> (乘法)</strong>：将整数乘以刚才的 <code>scale</code>（<code>B &lt;1&gt;</code> 即 <code>0.007812</code>）。</li>
+<li><strong>至此，数据又变回了浮点数（FP32），并流向 <code>Conv</code>。</strong></li>
+</ul>
+<h3 id="右侧权重量化">右侧权重量化</h3>
+<p>在 <code>Conv</code> 算子的右侧，是针对卷积核权重（<code>conv.weight</code>）的伪量化路径。</p>
+<ul>
+<li><strong>它的算子顺序稍微有些不同</strong>：<code>Identity</code> (权重本身) 和 <code>Round</code> 分头行动，经过 <code>Add</code>、<code>Clip</code>、<code>Sub</code>、<code>Mul</code>。</li>
+<li><strong>为什么少了一个 <code>Div</code>？</strong>：
+<ul>
+<li>因为权重的 <code>scale</code> 是在导出时就已经确定并且固定的。PyTorch 在导出 ONNX 时，为了优化计算图，<strong>提前在离线状态下把权重除以 Scale 的步骤做完了</strong>。所以留在图里的 <code>Round</code> 已经是缩放后的结果，后面只需要做 <code>Clip</code>（确保在 -128 到 127 之间）和 <code>Mul</code>（反量化乘以权重的黄金 <code>scale = 0.004567</code>）即可。</li>
+</ul>
+</li>
+</ul>
+<h3 id="核心计算与输出量化（Conv-ReLU-Output-Quant）">核心计算与输出量化（Conv + ReLU + Output Quant）</h3>
+<p>当左边的输入（激活值）和右边的输入（权重）都在浮点空间完成了“量化再反量化”的仿真后，它们终于在 <strong><code>Conv</code> (蓝色算子)</strong> 汇合，执行矩阵乘加运算。</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xl">[C<span class="hljs-function"><span class="hljs-title">onv</span>] -&gt;</span> [R<span class="hljs-function"><span class="hljs-title">elu</span>] -&gt;</span> [D<span class="hljs-function"><span class="hljs-title">iv</span>] -&gt;</span> R<span class="hljs-function"><span class="hljs-title">ound</span> -&gt;</span> A<span class="hljs-function"><span class="hljs-title">dd</span> -&gt;</span> C<span class="hljs-function"><span class="hljs-title">lip</span> -&gt;</span> S<span class="hljs-function"><span class="hljs-title">ub</span> -&gt;</span> M<span class="hljs-function"><span class="hljs-title">ul</span>] -&gt;</span> [output]<br></code></pre></td></tr></table></figure>
+<ol>
+<li><strong>算子融合的体现</strong>：之前提到过：“框架是在融合前做量化统计，还是融合后做？这两种直方图算出来的 Scale 差了十万八千里”。在我们的白盒代码里，我们显式执行了 <code>fuse_modules</code>。可以看到，<code>Conv</code> 后面紧跟着 <code>Relu</code>，而<strong>输出激活值的伪量化组件（Div <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo></mrow><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">→</span></span></span></span> Round … <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>→</mo></mrow><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">→</span></span></span></span> Mul）被精准地安置在 <code>Relu</code> 的出口下方</strong>。这确保了我们统计直方图、计算 KL/MSE 时的输入数据，全都是经过 ReLU 过滤后的真实分布，实现了完美的白盒对齐。</li>
+<li><strong>最后输出</strong>：经过 ReLU 之后的特征图（Feature Map），再次经过最后一组组件的约束，乘以输出 <code>scale = 0.012345</code>。最终从 <code>output</code> 吐出（尺寸为 <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>×</mo><mn>16</mn><mo>×</mo><mn>224</mn><mo>×</mo><mn>224</mn></mrow><annotation encoding="application/x-tex">1 \times 16 \times 224 \times 224</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">16</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">224</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">224</span></span></span></span>）。</li>
+</ol>
+<h3 id="思考：这密密麻麻的算子，怎么加速？">思考：这密密麻麻的算子，怎么加速？</h3>
+<p>你看到这张图可能会想：“天哪，原本只要跑一个 <code>Conv</code> 和 <code>ReLU</code>，现在前后加起来多了十几个 <code>Div</code>、<code>Round</code>、<code>Mul</code>、<code>Clip</code> 算子，这模型不应该变得巨慢无比吗？”</p>
+<p><strong>这就是量化对齐（Quantization Alignment）最神奇的地方：</strong></p>
+<p>当你把这个 ONNX 文件提交给 TensorRT、ONNX Runtime（带有精度加速后端）或者车端芯片的 NPU 编译器时，编译器内部的优化器（Graph Optimizer）会玩一个叫 <strong>“模式匹配（Pattern Matching）”</strong> 的游戏：</p>
+<ul>
+<li>它一旦抓取到 <code>[Div -&gt; Round -&gt; Add -&gt; Clip -&gt; Sub -&gt; Mul]</code> 这个特定的组合，就会发出警报：“报告！发现标准伪量化节点！”</li>
+<li>编译器会<strong>无情地把这些多出来的数学算子全部从图里抹去（强力擦除）</strong>。</li>
+<li>它会把这些算子身上携带的 <code>scale</code> 数字（<code>0.007812</code>、<code>0.004567</code> 等）直接抽出来，作为配置参数固化到硬件的硬件寄存器中。</li>
+<li><strong>在底层芯片真正执行的那一瞬间，这个复杂的图在硬件里会坍塌成这个样子：</strong></li>
+</ul>
+<p>真实的硬件流水线变成了：</p>
+<p class="katex-block "><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mtext>纯 INT8 输入</mtext><mo>⟶</mo><mtext>NPU/Tensor Core 内部高效执行整数卷积运算</mtext><mo>⟶</mo><mtext>纯 INT8 输出</mtext></mrow><annotation encoding="application/x-tex">\text{纯 INT8 输入} \longrightarrow \text{NPU/Tensor Core 内部高效执行整数卷积运算} \longrightarrow \text{纯 INT8 输出}
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6943em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord cjk_fallback">纯</span><span class="mord"> INT8 </span><span class="mord cjk_fallback">输入</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">NPU/Tensor Core </span><span class="mord cjk_fallback">内部高效执行整数卷积运算</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⟶</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord cjk_fallback">纯</span><span class="mord"> INT8 </span><span class="mord cjk_fallback">输出</span></span></span></span></span></span></p>
+<p>所以现在的这张图，是“用 FP32 算子做完美的 INT8 行为仿真”。它在格式上完全锁死了数值分辨率，而在实际部署运行的时侯，它将享受纯整数流水线带来的翻倍吞吐量和极低的 Latency。</p>
+<p>现在再去重温一下代码，相信你会有不同的感受</p>
+<blockquote>
+<p>看到这里你可能会有一个疑问：</p>
+<p>既然这叫量化模型，为什么送进 <code>Conv</code> 算子的依然是经过 <code>Mul</code>（反量化）出来的浮点数？这不还是浮点计算吗？</p>
+<p>然而这恰恰是工业级 QDQ 模型的高明之处，主要有以下三个核心原因：</p>
+<h4 id="浮点框架（PyTorch-ONNX-Runtime）在运行期需要“数值仿真”">浮点框架（PyTorch/ONNX Runtime）在运行期需要“数值仿真”</h4>
+<p>在 Python 侧或标准的 ONNX 运行时，框架底层的算子（例如 <code>conv2d</code>）在默认情况下都是 <strong>FP32（单精度浮点）</strong></p>
+<ul>
+<li><strong>如果直接送入 INT8 整数</strong>：浮点卷积算子根本无法解析定点整数，或者会把整数 <code>127</code> 直接当成浮点数 <code>127.0</code> 去计算，整个网络的数值流直接就彻底崩塌了。</li>
+<li><strong>反量化的真实意图</strong>：通过 <code>Mul</code>（乘以 Scale），把数据拉回浮点空间（FP32），但是<strong>此时的浮点数已经失去了原本高精度的连续性，变成了断续的、“带有阶梯感”的浮点数</strong>。</li>
+</ul>
+<p>也就是说，反量化后的 FP32 数值在框架里运行，能够<strong>完美仿真出模型在 INT8 芯片上运行时所产生的精度损失和噪声</strong>。这就叫“模拟量化（Fake Quantization）”。</p>
+<h4 id="算子融合（Operator-Fusion）的“接头暗号”">算子融合（Operator Fusion）的“接头暗号”</h4>
+<p>这在工程落地上被称为 <strong>“模式匹配（Pattern Matching）”</strong>。</p>
+<p>推理引擎（如 TensorRT、芯片 NPU 编译器）在读取 ONNX 模型时，它不是傻傻地一个算子一个算子去执行的，它会进行大规模的<strong>计算图优化</strong>。</p>
+<p>当编译器看到一整串 <code>[Div -&gt; Round -&gt; Add -&gt; Clip -&gt; Sub -&gt; Mul] -&gt; Conv</code> 时，它就会识别出这是一个标准的 <strong>QDQ（Quantize-Dequantize）模式</strong>。编译器会把这个结构看作是一个“接头暗号”：</p>
+<ul>
+<li><strong>编译器的动作</strong>：它会把这一堆模拟量化的浮点算子（<code>Div</code>, <code>Round</code>, <code>Mul</code> 等）<strong>彻底从计算图里抹去，物理擦除</strong>。</li>
+<li><strong>硬件的替换</strong>：它会把这些算子里自带的 <code>scale</code> 提取出来，直接配置到硬件（如 Tensor Core 或 DSP）的寄存器中。</li>
+<li><strong>运行时的真相</strong>：在实际芯片运行的一瞬间，硬件会直接调用纯定点计算指令（如 <code>vpmaddubsw</code>），直接执行纯 INT8 的矩阵乘加。</li>
+</ul>
+<p>所以，留在 ONNX 里的“反量化”是为了<strong>在离线状态下把 Scale 参数带给编译器</strong>。一旦编译结束，反量化在运行时<strong>不占用任何计算开销</strong>。</p>
+<h4 id="为了-QAT（量化感知训练）中反向传播的梯度流动">为了 QAT（量化感知训练）中反向传播的梯度流动</h4>
+<p>如果你是在训练阶段（QAT）加入这个组件，反量化更是不可或缺：</p>
+<ul>
+<li>如果你把特征直接变成了真正的 INT8 整数，在反向传播计算梯度时，整数的梯度是离散的，甚至 <code>Round</code>（四舍五入）算子在数学上的导数<strong>处处为 0</strong>（或者是无穷大）。这会导致反向传播的梯度在这一层<strong>彻底断绝</strong>，模型根本无法训练。</li>
+<li>通过反量化转回 FP32，梯度就可以沿着连续的浮点数一路顺畅地反向传导回前面的层，让权重可以继续通过梯度下降进行微调，从而<strong>主动去学出一套能够适应 INT8 噪声的权重</strong>。</li>
+</ul>
+</blockquote>
+<h2 id="总结">总结</h2>
+<p>到这里，恭喜你已经成功打破了框架的“量化黑盒”，目前我们已经做了：</p>
+<ul>
+<li>统计了直方图；</li>
+<li>用 KL/MSE 算法 筛选出了最优的阈值；</li>
+<li>避开了框架自带的盲目校准，通过代码，显式地把这个 Scale 写进了 ONNX 模型。</li>
+</ul>
+<h2 id="下节预告">下节预告</h2>
+<p><strong>下节标题：2.4 神经网络量化 —— 完整的神经网络量化实战</strong></p>
+<ul>
+<li>我们将采用之前提到的简易版神经网络：<code>x -&gt; conv -&gt; relu -&gt; fc -&gt; y</code>，融合我们学过的所有内容，进行真正的量化实战。</li>
+</ul>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/DeepLearning/" class="category-chain-item">DeepLearning</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E9%87%8F%E5%8C%96/" class="print-no-link">#量化</a>
+      
+        <a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/" class="print-no-link">#编译器</a>
+      
+        <a href="/tags/%E8%BD%AF%E7%A1%AC%E7%BB%93%E5%90%88/" class="print-no-link">#软硬结合</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>【深度学习】神经网络量化 —— Scale 注入模型实战</div>
+      <div>https://laojiao1.github.io/2026/05/30/Compiler/Quantification4/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年5月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/05/28/Compiler/Quantification3/" title="【深度学习】神经网络量化 —— 量化对齐实战篇">
+                        <span class="hidden-mobile">【深度学习】神经网络量化 —— 量化对齐实战篇</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
