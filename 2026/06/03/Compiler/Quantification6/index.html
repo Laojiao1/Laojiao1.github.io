@@ -19,23 +19,26 @@
   <meta name="author" content="Laojiao">
   <meta name="keywords" content="">
   
-    <meta name="description" content="最大子列和问题 求解一个整数数组 A 的最大子序列和（Maximum Subsequence Sum），即在数组 A 中找到一个连续子序列，使得该子序列中所有元素的和最大。 算法1：暴力枚举 逐一遍历数组中所有可能的连续子序列，计算其和并记录最大值。 123456789101112131415int MaxSubseqSum1(int A[], int N)&#123; 	int ThisSum,">
+    <meta name="description" content="动态量化与静态量化 很多人第一次学量化时会认为 “量化不就是提前算好 scale，然后推理时直接 int8 吗？” 但实际上：量化最大的难点之一恰恰是 —— activation 的范围是不稳定的 因为 weight 是固定的，但 activation 是跟输入数据强相关的。 比如对于同一个模型来说，输入白天图像和输入夜晚图像的 activation 分布可能完全不同。 于是问题就来了：scale">
 <meta property="og:type" content="article">
-<meta property="og:title" content="【常见算法问题】最大子序列和问题">
-<meta property="og:url" content="https://laojiao1.github.io/2025/01/11/OJ/MaxSubColumn/index.html">
+<meta property="og:title" content="【深度学习】动态量化与静态量化">
+<meta property="og:url" content="https://laojiao1.github.io/2026/06/03/Compiler/Quantification6/index.html">
 <meta property="og:site_name" content="Laojiao">
-<meta property="og:description" content="最大子列和问题 求解一个整数数组 A 的最大子序列和（Maximum Subsequence Sum），即在数组 A 中找到一个连续子序列，使得该子序列中所有元素的和最大。 算法1：暴力枚举 逐一遍历数组中所有可能的连续子序列，计算其和并记录最大值。 123456789101112131415int MaxSubseqSum1(int A[], int N)&#123; 	int ThisSum,">
+<meta property="og:description" content="动态量化与静态量化 很多人第一次学量化时会认为 “量化不就是提前算好 scale，然后推理时直接 int8 吗？” 但实际上：量化最大的难点之一恰恰是 —— activation 的范围是不稳定的 因为 weight 是固定的，但 activation 是跟输入数据强相关的。 比如对于同一个模型来说，输入白天图像和输入夜晚图像的 activation 分布可能完全不同。 于是问题就来了：scale">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2025-01-11T00:50:00.000Z">
-<meta property="article:modified_time" content="2025-01-11T00:50:00.000Z">
+<meta property="og:image" content="https://laojiao1.github.io/img/DeepLearning/Quantization/Quantization.png">
+<meta property="article:published_time" content="2026-06-03T11:13:37.653Z">
+<meta property="article:modified_time" content="2026-06-03T11:13:37.653Z">
 <meta property="article:author" content="Laojiao">
-<meta property="article:tag" content="OJ">
-<meta property="article:tag" content="算法">
+<meta property="article:tag" content="量化">
+<meta property="article:tag" content="编译器">
+<meta property="article:tag" content="软硬结合">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/DeepLearning/Quantization/Quantization.png">
   
   
   
-  <title>【常见算法问题】最大子序列和问题 - Laojiao</title>
+  <title>【深度学习】动态量化与静态量化 - Laojiao</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -234,7 +237,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="【常见算法问题】最大子序列和问题"></span>
+            <span id="subtitle" data-typed-text="【深度学习】动态量化与静态量化"></span>
           
         </div>
 
@@ -245,8 +248,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-01-11 08:50" pubdate>
-          2025年1月11日 早上
+        <time datetime="2026-06-03 19:13" pubdate>
+          2026年6月3日 晚上
         </time>
       </span>
     
@@ -257,7 +260,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          301 字
+          1.7k 字
         
       </span>
     
@@ -268,7 +271,7 @@
         
         
         
-          3 分钟
+          15 分钟
         
       </span>
     
@@ -305,25 +308,110 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">【常见算法问题】最大子序列和问题</h1>
+            <h1 id="seo-header">【深度学习】动态量化与静态量化</h1>
             
             
               <div class="markdown-body">
                 
-                <h1>最大子列和问题</h1>
-<p>求解一个整数数组 A 的<strong>最大子序列和</strong>（Maximum Subsequence Sum），即在数组 A 中找到一个连续子序列，使得该子序列中所有元素的和最大。</p>
-<h2 id="算法1：暴力枚举">算法1：暴力枚举</h2>
-<p>逐一遍历数组中所有可能的连续子序列，计算其和并记录最大值。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">MaxSubseqSum1</span><span class="hljs-params">(<span class="hljs-type">int</span> A[], <span class="hljs-type">int</span> N)</span><br>&#123;<br> 	<span class="hljs-type">int</span> ThisSum, MaxSum = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">int</span> i, j, k;<br>    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; N; i++) &#123;<br>        <span class="hljs-keyword">for</span>(j = <span class="hljs-number">0</span>; j &lt; N; j++) &#123;<br>            ThisSum = <span class="hljs-number">0</span>;<br>            <span class="hljs-keyword">for</span>(k = i; k &lt;= j; k++)<br>                ThisSum += A[k];<br>                <span class="hljs-keyword">if</span>(ThisSum &gt; MaxSum) <br>                    MaxSum = ThisSum;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> MaxSum;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>算法复杂度：O(<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>N</mi><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">N^3</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">3</span></span></span></span></span></span></span></span></span></span></span>)</p>
-<h2 id="算法2：暴力优化">算法2：暴力优化</h2>
-<p>枚举所有可能的子序列求解最大子序列和。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">MaxSubseqSum1</span><span class="hljs-params">(<span class="hljs-type">int</span> A[], <span class="hljs-type">int</span> N)</span><br>&#123;<br> 	<span class="hljs-type">int</span> ThisSum, MaxSum = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">int</span> i, j, k;<br>    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; N; i++) &#123;<br>        ThisSum = <span class="hljs-number">0</span>;<br>        <span class="hljs-keyword">for</span>(j = i; j &lt; N; j++) &#123;<br>			ThisSum += A[j];<br>             <span class="hljs-keyword">if</span>(ThisSum &gt; MaxSum) <br>                 MaxSum = ThisSum;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> MaxSum;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>复杂度：O(<span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>N</mi><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">N^2</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span>)</p>
-<h2 id="算法3：贪心">算法3：贪心</h2>
-<p>通过一次遍历动态计算最大子序列和。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-type">int</span> <span class="hljs-title function_">MaxSubseqSum1</span><span class="hljs-params">(<span class="hljs-type">int</span> A[], <span class="hljs-type">int</span> N)</span> &#123;<br>    <span class="hljs-type">int</span> ThisSum, MaxSum = <span class="hljs-number">0</span>;<br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-keyword">for</span>(i = <span class="hljs-number">0</span>; i &lt; N; i++) &#123;<br>        ThisSum += A[i];<br>        <span class="hljs-keyword">if</span>(ThisSum &gt; MaxSum) &#123;<br>            MaxSum = ThisSum;<br>        &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (ThisSum &lt; <span class="hljs-number">0</span>) &#123; <span class="hljs-comment">// 如果当前子序列小于0，则不可能使后面增大，抛弃</span><br>            ThisSum = <span class="hljs-number">0</span>;<br>        &#125;<br>    &#125;<br>    <span class="hljs-keyword">return</span> MaxSum;<br>&#125;<br></code></pre></td></tr></table></figure>
-<p>复杂度：O(N)</p>
+                <h1>动态量化与静态量化</h1>
+<p>很多人第一次学量化时会认为 “量化不就是提前算好 scale，然后推理时直接 int8 吗？”</p>
+<p>但实际上：量化最大的难点之一恰恰是 —— activation 的范围是不稳定的</p>
+<p>因为 weight 是固定的，但 activation 是跟输入数据强相关的。</p>
+<p>比如对于同一个模型来说，输入白天图像和输入夜晚图像的 activation 分布可能完全不同。</p>
+<p>于是问题就来了：scale 到底应该什么时候统计？</p>
+<p>这就引出了：<strong>动态量化（Dynamic Quantization）与 静态量化（Static Quantization）</strong></p>
+<h2 id="动态量化（Dynamic-Quantization）">动态量化（Dynamic Quantization）</h2>
+<p>动态量化的核心思想非常直接：推理时，现场统计 activation 范围。</p>
+<p>也就是说：模型运行过程中，每次输入数据时，都会重新计算：</p>
+<ul>
+<li>min/max</li>
+<li>scale</li>
+<li>zero-point</li>
+</ul>
+<p><strong>所以，动态量化最大的特点是：scale 是实时变化的。</strong></p>
+<p>这样做最大的好处是：activation 范围适应性极强，因为每次都用当前数据的真实分布，不容易 overflow，scale过大，不容易动态范围浪费，因此动态量化通常精度较高。</p>
+<p>但与此同时，它的问题也比较明显：推理时需要额外统计，资源耗费大，速度较慢。</p>
+<p>想象一下，你在每次推理时都要：遍历 activation、统计 min/max、计算 scale、计算 zero-point，那么这一定会产生：额外 latency、更多 memory access、以及更多 CPU/GPU 开销。所以，动态量化虽然精度不错，但速度不一定最快，特别是在 DSP 或 NPU 上。</p>
+<blockquote>
+<p>硬件最怕动态变化，它最喜欢的是提前固定好</p>
+</blockquote>
+<p><strong>此外，动态量化还有一个重要的特点：它通常只量化 weight</strong></p>
+<p>经典流程是：</p>
+<figure class="highlight xl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs xl"><span class="hljs-function"><span class="hljs-title">weight</span> -&gt;</span> int8<br><span class="hljs-function"><span class="hljs-title">activation</span> -&gt;</span> 动态fp32/int8<br></code></pre></td></tr></table></figure>
+<p>尤其在线性层特别常见，因为在 NLP 里，最大的开销往往是矩阵乘法权重，而不是 activation，所以只量化 weight，已经能明显减小模型大小</p>
+<h3 id="代码示例">代码示例</h3>
+<p>动态量化的 Scale 绝不提前锁定，而是每次执行 <code>forward</code> 时，现场对当前的输入特征图遍历一遍</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs Python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">DynamicQuantizedLinear</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self</span>):<br>        <span class="hljs-built_in">super</span>().__init__()<br>        <span class="hljs-variable language_">self</span>.weight = nn.Parameter(torch.randn(<span class="hljs-number">10</span>, <span class="hljs-number">10</span>))<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-comment"># 1. 每来一个样本，线上实时遍历数据，现场统计绝对最大值</span><br>        max_val = torch.<span class="hljs-built_in">max</span>(torch.<span class="hljs-built_in">abs</span>(x))<br>        dynamic_scale = max_val / <span class="hljs-number">127.0</span>  <span class="hljs-comment"># 现场算 Scale</span><br>        <br>        <span class="hljs-comment"># 2. 现场量化与反量化（消耗算力、产生内存访问延迟）</span><br>        q_x = torch.clamp(torch.<span class="hljs-built_in">round</span>(x / dynamic_scale), -<span class="hljs-number">128</span>, <span class="hljs-number">127</span>)<br>        dq_x = q_x * dynamic_scale<br>        <br>        <span class="hljs-keyword">return</span> nn.functional.linear(dq_x, <span class="hljs-variable language_">self</span>.weight)<br></code></pre></td></tr></table></figure>
+<h2 id="静态量化（Static-Quantization）">静态量化（Static Quantization）</h2>
+<p>静态量化则完全相反，它的思想是：<strong>推理前，提前把所有的 scale 固定好（上节课我们就是用的这种方式）</strong></p>
+<p>也就是说，在部署之前，先拿一批 calibration dataset 跑一边模型，统计：</p>
+<ul>
+<li>activation histogram</li>
+<li>min/max</li>
+<li>percentile</li>
+<li>KL</li>
+<li>MSE</li>
+</ul>
+<p>然后提前确定每一层的 scale。在部署后和推理时，直接使用固定的 scale，不再动态计算。</p>
+<p>这样做最大的好处是：推理极快。</p>
+<ul>
+<li>原因显而易见：不用再统计分布，更新scale，计算zero-point，整个计算图直接变成纯整数流，对硬件极为友好，因为硬件终于可以提前优化整个整数计算图了。</li>
+</ul>
+<p>但静态量化最大的问题也很明显：</p>
+<ul>
+<li>因为 scale 一旦固定，后面将永远不变。于是，如果 calibration 数据不能代表真实数据分布，那么部署后 activation 很可能直接炸掉。</li>
+<li>例如校准集全是白天图像，结果部署后来了夜间图像，于是 activation 范围变化巨大，这时候固定的 scale 可能就会出现很多问题，导致精度暴跌。</li>
+</ul>
+<blockquote>
+<p>这也是为什么很多人发现 TensorRT INT8 离线测试很好，但线上突然崩。因为问题往往不在模型，而是 calibration dataset 不够真实</p>
+</blockquote>
+<p>所以 动态量化 vs 静态量化 本质其实是 —— 灵活性 vs 性能之间的 trade-off。</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>scale</th>
+<th>精度</th>
+<th>速度</th>
+<th>硬件友好</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>动态量化</td>
+<td>实时计算</td>
+<td>高</td>
+<td>较慢</td>
+<td>一般</td>
+</tr>
+<tr>
+<td>静态量化</td>
+<td>提前固定</td>
+<td>依赖校准</td>
+<td>极快</td>
+<td>极强</td>
+</tr>
+</tbody>
+</table>
+<p>现代量化研究，其实一直都在努力做一件事：用静态量化，逼近动态量化的精度。</p>
+<h3 id="代码示例-2">代码示例</h3>
+<p>（虽然上节课已经有完整代码了，不过按照规矩还是举一个小栗子）</p>
+<p>静态量化的 Scale 注册为 <code>Buffer</code>（常量），在线上推理时，Scale 会保持“绝对静止”</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">class</span> <span class="hljs-title class_">StaticQuantizedConv</span>(nn.Module):<br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">__init__</span>(<span class="hljs-params">self, fixed_scale, fixed_zp</span>):<br>        <span class="hljs-built_in">super</span>().__init__()<br>        <span class="hljs-comment"># 离线校准算好的黄金参数，作为常量锁死在图里</span><br>        <span class="hljs-variable language_">self</span>.register_buffer(<span class="hljs-string">&#x27;scale&#x27;</span>, torch.tensor([fixed_scale]))<br>        <span class="hljs-variable language_">self</span>.register_buffer(<span class="hljs-string">&#x27;zero_point&#x27;</span>, torch.tensor([fixed_zp], dtype=torch.int32))<br>        <span class="hljs-variable language_">self</span>.weight = nn.Parameter(torch.randn(<span class="hljs-number">16</span>, <span class="hljs-number">1</span>, <span class="hljs-number">3</span>, <span class="hljs-number">3</span>))<br><br>    <span class="hljs-keyword">def</span> <span class="hljs-title function_">forward</span>(<span class="hljs-params">self, x</span>):<br>        <span class="hljs-comment"># 1. 激活值和权重完全在固定的比例尺下进行 Fake Quantize</span><br>        q_x = torch.clamp(torch.<span class="hljs-built_in">round</span>(x / <span class="hljs-variable language_">self</span>.scale) + <span class="hljs-variable language_">self</span>.zero_point, -<span class="hljs-number">128</span>, <span class="hljs-number">127</span>)<br>        dq_x = (q_x - <span class="hljs-variable language_">self</span>.zero_point) * <span class="hljs-variable language_">self</span>.scale<br>        <br>        <span class="hljs-comment"># 2. 送入卷积（硬件底层编译时会将上述 dq_x 的模拟浮点算子彻底抹去）</span><br>        <span class="hljs-keyword">return</span> nn.functional.conv2d(dq_x, <span class="hljs-variable language_">self</span>.weight, padding=<span class="hljs-number">1</span>)<br></code></pre></td></tr></table></figure>
+<h2 id="实际工程中，是怎么做的？">实际工程中，是怎么做的？</h2>
+<p>在实际工业界（如车载芯片、手机端侧 NPU、服务器 GPU）中，两者的落地逻辑完全不同：</p>
+<h3 id="静态量化">静态量化</h3>
+<p>静态量化在真实工程中，绝对不是在线跑模型时去算参数，而是采用<strong>完全离线交接</strong>的逻辑：</p>
+<ol>
+<li><strong>离线校准（Offline Calibration）</strong>：在开发阶段，拿 100~500 张真实校准集图片跑前向传播，利用 <code>KL</code> 或 <code>MSE</code> 算法在后台生成一个密密麻麻的文本文件 —— <strong>校准缓存表（Calibration Cache Table）</strong>，锁定每一层的固定 Scale。</li>
+<li><strong>图层编译（Graph Compilation）</strong>：将原始浮点模型和校准表同时喂给推理引擎（如 TensorRT），编译器会通过<strong>模式匹配（Pattern Matching）</strong>，把图里用来仿真的 <code>Div/Round/Mul</code> 节点物理擦除，将固定的 Scale 常量直接强行灌入硬件寄存器。</li>
+<li><strong>线上纯整数流（Runtime）</strong>：模型在线上跑实时业务时，离线计算早已结束。硬件不再做任何多余统计，直接开启纯 INT8 的硬件级极速矩阵乘加，将 Latency 降到极致。</li>
+</ol>
+<h3 id="动态量化">动态量化</h3>
+<p>很多人好奇：既然动态量化有内存访问延迟大、算力浪费的缺点，为什么工业界还没淘汰它？</p>
+<p>万物都有其存在的道理：</p>
+<p>动态量化是<strong>大语言模型（LLM）的救星</strong>：在 Transformer 架构（如 Llama、ChatGPT）中，线性层的权重（Weight）是极其庞大的，但其实每次推理时的 Token（Activation）相对较小，此时最核心的瓶颈是<strong>带宽拉取权重的速度（Memory Bound）</strong>，并不是计算速度，所以动态量化非常契合大语言模型的特点。</p>
+<p><strong>特定策略（Weight-Only / SmoothQuant）</strong>：工业界常在 LLM 中用动态量化<strong>只量化权重（INT8/INT4）</strong>，并在运行时动态把权重解压回浮点与激活值计算。既压缩了模型体积、减少了带宽占用，又完美避开了激活值现场统计带来的 Latency 雪崩。</p>
 
                 
               </div>
@@ -342,7 +430,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/OJ/" class="category-chain-item">OJ</a>
+  <a href="/categories/DeepLearning/" class="category-chain-item">DeepLearning</a>
   
   
 
@@ -357,9 +445,11 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/OJ/" class="print-no-link">#OJ</a>
+        <a href="/tags/%E9%87%8F%E5%8C%96/" class="print-no-link">#量化</a>
       
-        <a href="/tags/%E7%AE%97%E6%B3%95/" class="print-no-link">#算法</a>
+        <a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/" class="print-no-link">#编译器</a>
+      
+        <a href="/tags/%E8%BD%AF%E7%A1%AC%E7%BB%93%E5%90%88/" class="print-no-link">#软硬结合</a>
       
     </div>
   
@@ -371,8 +461,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>【常见算法问题】最大子序列和问题</div>
-      <div>https://laojiao1.github.io/2025/01/11/OJ/MaxSubColumn/</div>
+      <div>【深度学习】动态量化与静态量化</div>
+      <div>https://laojiao1.github.io/2026/06/03/Compiler/Quantification6/</div>
     </div>
     <div class="license-meta">
       
@@ -384,7 +474,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年1月11日</div>
+          <div>2026年6月3日</div>
         </div>
       
       
@@ -416,18 +506,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2025/01/11/OJ/ChainForwardStar/" title="【算法笔记】存图方式 — 链式前向星">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">【算法笔记】存图方式 — 链式前向星</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2025/01/11/OJ/TraverseGraph/" title="【洛谷】P3916 —— 反向建边 + dfs">
-                        <span class="hidden-mobile">【洛谷】P3916 —— 反向建边 + dfs</span>
+                      <a href="/2026/06/01/Compiler/Quantification5/" title="【深度学习】神经网络量化 —— 完整的神经网络量化实战">
+                        <span class="hidden-mobile">【深度学习】神经网络量化 —— 完整的神经网络量化实战</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
