@@ -27,8 +27,8 @@
 <meta property="og:description" content="Github 指令 Git 从 0 到 1 创建仓库并推送到 main 分支 1. 进入项目目录 1cd 你的项目目录 例如： 1cd E:&#x2F;Code&#x2F;my_project  2. 初始化 Git 仓库（第一次才需要） 1git init  3. 将默认分支改为 main（推荐） 1git branch -M main  4. 创建 .gitignore（推荐，可根据实际情况修改） 根据项目需要添">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://laojiao1.github.io/img/others/github.png">
-<meta property="article:published_time" content="2026-06-12T00:48:09.190Z">
-<meta property="article:modified_time" content="2026-06-12T00:48:09.190Z">
+<meta property="article:published_time" content="2026-06-12T01:01:19.133Z">
+<meta property="article:modified_time" content="2026-06-12T01:01:19.133Z">
 <meta property="article:author" content="Laojiao">
 <meta property="article:tag" content="github">
 <meta name="twitter:card" content="summary_large_image">
@@ -246,8 +246,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-06-12 08:48" pubdate>
-          2026年6月12日 早上
+        <time datetime="2026-06-12 09:01" pubdate>
+          2026年6月12日 上午
         </time>
       </span>
     
@@ -258,7 +258,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          631 字
+          650 字
         
       </span>
     
@@ -380,13 +380,11 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git switch -c xx<br></code></pre></td></tr></table></figure>
 <p>如果 Git 版本较旧：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git checkout -b xx<br></code></pre></td></tr></table></figure>
+<p>成功的话会在后面显示一个（xx）</p>
 <hr>
-<h2 id="3-查看当前是否已经切换成功">3. 查看当前是否已经切换成功</h2>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git branch<br></code></pre></td></tr></table></figure>
-<p>例如：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs text">  main<br>* xx<br></code></pre></td></tr></table></figure>
-<p>说明当前已经位于 <code>xx</code> 分支。</p>
-<hr>
+<h2 id="3-连接到远程仓库（选做）">3. 连接到远程仓库（选做）</h2>
+<p>如果在同一个目录下，可以不添加</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git remote add origin https://github.com/用户名/仓库名.git<br></code></pre></td></tr></table></figure>
 <h2 id="4-添加所有修改">4. 添加所有修改</h2>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">git add .<br></code></pre></td></tr></table></figure>
 <hr>
