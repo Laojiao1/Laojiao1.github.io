@@ -318,7 +318,7 @@
 <p>在 64 位操作系统（比如你用的 x86_64 CPU 或现代 GPU）下，<strong>指针就是一个 64 位的无符号整数（8 个字节大小）</strong>。<br>
 不管这个指针是指向一个 1 字节的 <code>char</code>，还是指向一个占用几百 MB 的巨型 <code>Tensor</code> 结构体，<strong>指针本身永远只占 8 个字节</strong>。它里面存放的值，就是虚拟内存空间中的一个地址编号。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">int</span> a = <span class="hljs-number">42</span>;       <span class="hljs-comment">// 在 Stack（栈）上分配 4 个字节，存入 42</span><br><span class="hljs-type">int</span>* p = &amp;a;      <span class="hljs-comment">// 在 Stack 上再分配 8 个字节存指针 p，里面保存了 a 的首地址</span><br>*p = <span class="hljs-number">100</span>;         <span class="hljs-comment">// 通过地址找到那 4 个字节，修改内容为 100</span><br></code></pre></td></tr></table></figure>
-<p><strong>🔥 硬核视角（汇编层面）：</strong><br>
+<p><strong>汇编层面：</strong><br>
 在 CPU 看来，根本没有“指针”这个概念。当你执行 <code>*p = 100</code> 时，编译器生成的汇编指令大概是这样的：<br>
 <code>mov DWORD PTR [rbx], 100</code>  （假设指针的值存在 <code>rbx</code> 寄存器里，<code>[rbx]</code> 就代表去读取/写入这个地址指向的内存）。<br>
 <strong>解引用 (<code>*p</code>) 的本质，就是一次 CPU 的访存操作（Load/Store）。</strong> 在高性能计算中，最怕的就是指针乱指（Cache Miss），导致 CPU 苦等内存数据。</p>
@@ -334,7 +334,7 @@
 <p><strong>② 指针算术（Pointer Arithmetic）—— 算子开发的核心</strong><br>
 如果你对指针加一，它在内存中前进的距离取决于<strong>它指向类型的大小</strong>。</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-type">float</span>* ptr = (<span class="hljs-type">float</span>*)<span class="hljs-number">0x1000</span>;<br>ptr = ptr + <span class="hljs-number">1</span>;  <span class="hljs-comment">// ptr 变成了 0x1004 (因为 sizeof(float) 是 4)</span><br></code></pre></td></tr></table></figure>
-<p><strong>🔥 硬核应用（PyTorch/Triton 中的内存对齐与访存）：</strong><br>
+<p><strong>PyTorch/Triton 中的内存对齐与访存：</strong><br>
 在写深度学习算子（比如自己实现一个矩阵乘法或 Softmax）时，如果你有一个一维大数组来模拟二维 Tensor，你会大量依赖这种指针算术：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-comment">// 假设矩阵维度是 [Row, Col]，我们在计算 [i, j] 的内存地址：</span><br><span class="hljs-type">float</span>* data = tensor.data_ptr;<br><span class="hljs-type">float</span>* current_element = data + (i * Col + j); <br></code></pre></td></tr></table></figure>
 <p>如果类型不对，你的内存指针就会完全偏移，读出“乱码”数据（往往表现为 Loss 变成 NaN）。</p>
