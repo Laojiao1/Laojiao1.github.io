@@ -1,0 +1,823 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="1. C++ unique_ptr 思考一个问题：C++ 为什么能在没有 GC（垃圾回收）的情况下，依然保持极高的性能和绝对的内存安全？ 答案就在于生命周期管理。 下面将基于几个经典场景，逐步引出 C++ 中的智能指针 一：裸指针存在的严重问题（没有生命周期管理） 在底层开发（如算子内存分配）中，如果使用最原始的 new&#x2F;delete，极易引发内存泄漏 假设用最古老的 C 语言思路写了这段代码：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ unique_ptr">
+<meta property="og:url" content="https://laojiao1.github.io/2026/07/07/Compiler/C++/1.%20C++%20unique_ptr/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="1. C++ unique_ptr 思考一个问题：C++ 为什么能在没有 GC（垃圾回收）的情况下，依然保持极高的性能和绝对的内存安全？ 答案就在于生命周期管理。 下面将基于几个经典场景，逐步引出 C++ 中的智能指针 一：裸指针存在的严重问题（没有生命周期管理） 在底层开发（如算子内存分配）中，如果使用最原始的 new&#x2F;delete，极易引发内存泄漏 假设用最古老的 C 语言思路写了这段代码：">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/algorithm/C++/image.png">
+<meta property="article:published_time" content="2026-07-07T12:39:28.278Z">
+<meta property="article:modified_time" content="2026-07-07T12:39:28.278Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="C++">
+<meta property="article:tag" content="编译器">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/algorithm/C++/image.png">
+  
+  
+  
+  <title>C++ unique_ptr - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C++ unique_ptr"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-07 20:39" pubdate>
+          2026年7月7日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          33 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">C++ unique_ptr</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>1. C++ unique_ptr</h1>
+<p><strong>思考一个问题</strong>：C++ 为什么能在没有 GC（垃圾回收）的情况下，依然保持极高的性能和绝对的内存安全？</p>
+<p>答案就在于<strong>生命周期管理</strong>。</p>
+<p>下面将基于几个经典场景，逐步引出 C++ 中的智能指针</p>
+<h2 id="一：裸指针存在的严重问题（没有生命周期管理）">一：裸指针存在的严重问题（没有生命周期管理）</h2>
+<p>在底层开发（如算子内存分配）中，如果使用最原始的 <code>new/delete</code>，极易引发内存泄漏</p>
+<p>假设用最古老的 C 语言思路写了这段代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">process_tensor</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// 1. 在堆（Heap）上申请了 1GB 的显存/内存，拿到裸指针</span><br>    <span class="hljs-type">float</span>* tensor_data = <span class="hljs-keyword">new</span> <span class="hljs-type">float</span>[<span class="hljs-number">256</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>]; <br>    <br>    <span class="hljs-comment">// 2. 突发情况：比如除以 0 或者语法树解析失败</span><br>    <span class="hljs-keyword">if</span> (error_happened) &#123;<br>        <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 【灾难发生】函数提前退出，底下的 delete 永远不会被执行！</span><br>    &#125;<br>    <br>    <span class="hljs-comment">// 3. 正常情况下的释放</span><br>    <span class="hljs-keyword">delete</span>[] tensor_data; <br>&#125;<br></code></pre></td></tr></table></figure>
+<p><strong>问题在哪？</strong> 裸指针 <code>tensor_data</code> 只是一个毫无感情的整数（存着地址）。当代码因为 <code>error_happened</code> 提前 <code>return</code> 时，函数结束了，那 1GB 的内存永远被丢在了堆里，没人管了（内存泄漏）。这就是<strong>没有生命周期管理</strong>的下场。</p>
+<h2 id="二：栈（Stack）的特殊机制-——-RAII-的灵感来源">二：栈（Stack）的特殊机制 —— RAII 的灵感来源</h2>
+<p>C++ 编译器有一条不可违背的铁律：<strong>作用域 <code>&#123; &#125;</code> 就是局部栈对象的“生死线”</strong>。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">MyGuard</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">MyGuard</span>() &#123; std::cout &lt;&lt; <span class="hljs-string">&quot;出生\n&quot;</span>; &#125;<br>    ~<span class="hljs-built_in">MyGuard</span>() &#123; std::cout &lt;&lt; <span class="hljs-string">&quot;死亡\n&quot;</span>; &#125;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">process_tensor</span><span class="hljs-params">()</span> </span>&#123;<br>    &#123; <span class="hljs-comment">// 开始</span><br>        MyGuard guard; <span class="hljs-comment">// guard 是分配在栈（Stack）上的局部对象</span><br>        <br>        <span class="hljs-keyword">if</span> (error_happened) &#123;<br>            <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 就算在这里提前退出...</span><br>        &#125;<br>    &#125; <span class="hljs-comment">// 结束</span><br>&#125;<br></code></pre></td></tr></table></figure>
+<p>在这个例子中，只要 <code>guard</code> 离开了它所在的 <code>&#123; &#125;</code> （不管是因为正常结束、还是提前 <code>return</code>、或者是抛出异常），编译器<strong>必定</strong>会自动触发它的析构函数 <code>~MyGuard()</code>。</p>
+<h2 id="三：把指针关进栈里（初级智能指针）">三：把指针关进栈里（初级智能指针）</h2>
+<p>既然栈变量死的时候必然会触发析构，那只要我们把堆上的裸指针放进栈对象里，不就不需要手动 <code>delete</code> 了吗？</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">class</span> <span class="hljs-title class_">SmartPointer</span> &#123;<br>    <span class="hljs-type">float</span>* ptr_; <span class="hljs-comment">// 偷偷把裸指针藏在肚子里</span><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">SmartPointer</span>(<span class="hljs-type">float</span>* p) &#123; ptr_ = p; &#125;<br>    ~<span class="hljs-built_in">SmartPointer</span>() &#123; <span class="hljs-keyword">delete</span>[] ptr_; &#125; <span class="hljs-comment">// 死亡时，顺手把肚子里的内存释放了</span><br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">process_tensor</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-comment">// p 活在栈上，但它肚子里装着堆上的 1GB 内存</span><br>    <span class="hljs-function">SmartPointer <span class="hljs-title">p</span><span class="hljs-params">(<span class="hljs-keyword">new</span> <span class="hljs-type">float</span>[<span class="hljs-number">256</span> * <span class="hljs-number">1024</span> * <span class="hljs-number">1024</span>])</span></span>; <br>    <br>    <span class="hljs-keyword">if</span> (error_happened) &#123;<br>        <span class="hljs-keyword">return</span>; <span class="hljs-comment">// 提前退出？完全没问题！</span><br>        <span class="hljs-comment">// 离开作用域时，p 被销毁，强制调用 ~SmartPointer()，内存安全释放。</span><br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这就是 <strong>RAII（资源获取即初始化）</strong>。通过绑定局部对象的生命周期，把手动释放的责任全部推给了编译器。</p>
+<h2 id="场景四：克隆带来的问题（为什么要禁掉-Copy）">场景四：克隆带来的问题（为什么要禁掉 Copy）</h2>
+<p>初级智能指针看起来完美，但如果被不小心复制，会导致整个系统崩溃。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">bad_code</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-function">SmartPointer <span class="hljs-title">p1</span><span class="hljs-params">(<span class="hljs-keyword">new</span> <span class="hljs-type">float</span>[<span class="hljs-number">10</span>])</span></span>; <span class="hljs-comment">// p1 肚子里装了指针 0xAAA</span><br>    SmartPointer p2 = p1;           <span class="hljs-comment">// p2 把 p1 复制了一份！大家肚子里都是 0xAAA</span><br>    <br>&#125; <span class="hljs-comment">// 重点来了！离开作用域，大家都要被销毁！</span><br></code></pre></td></tr></table></figure>
+<p><strong>回顾一下</strong>：</p>
+<ol>
+<li><code>p2</code> 先死，执行 <code>delete 0xAAA</code>，内存被回收。</li>
+<li>接着 <code>p1</code> 死，再次执行 <code>delete 0xAAA</code>。</li>
+<li><strong>最后！Double Free（重复释放），程序直接崩溃闪退。</strong></li>
+</ol>
+<p><strong>怎么解决？</strong></p>
+<ul>
+<li>直接从源头掐断，不准复制！</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">// 我们强行规定：同一块内存，只能有一个主人（独占所有权）</span><br><span class="hljs-built_in">unique_ptr</span>(<span class="hljs-type">const</span> unique_ptr&amp;) = <span class="hljs-keyword">delete</span>; <br></code></pre></td></tr></table></figure>
+<h2 id="场景五：不复制，但转移（移动语义-move）">场景五：不复制，但转移（移动语义 move）</h2>
+<p>既然不能复制，假如我想把这块内存传给另一个函数去处理怎么办？</p>
+<p><strong>答案是：移动语义 move</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">pass_baton</span><span class="hljs-params">()</span> </span>&#123;<br>    <span class="hljs-function">SmartPointer <span class="hljs-title">p1</span><span class="hljs-params">(<span class="hljs-keyword">new</span> <span class="hljs-type">float</span>[<span class="hljs-number">10</span>])</span></span>; <span class="hljs-comment">// p1 是主人 (0xAAA)</span><br>    <br>    <span class="hljs-comment">// 我们不复制，用 std::move 告诉编译器：强行转换为右值，触发“偷窃”！</span><br>    SmartPointer p2 = std::<span class="hljs-built_in">move</span>(p1); <br>    <br>    <span class="hljs-comment">// 偷窃过程（在移动构造函数中发生）：</span><br>    <span class="hljs-comment">// 1. p2 把 0xAAA 拿走。</span><br>    <span class="hljs-comment">// 2. p1 的肚子立刻被设为 nullptr（空）。</span><br>&#125; <br><span class="hljs-comment">// 离开作用域：</span><br><span class="hljs-comment">// p2 析构 -&gt; delete 0xAAA (正常释放)</span><br><span class="hljs-comment">// p1 析构 -&gt; delete nullptr (C++ 规定 delete 空指针是绝对安全的)</span><br></code></pre></td></tr></table></figure>
+<p><code>std::move</code> 在底层没有移动任何真实数据，它把一个左值强行“伪装”成右值，从而触发资源窃取，完成了一次<strong>指针的交换与清空</strong>（近零开销）。</p>
+<p>这里我们需要好好讲解一下 <code>std::move</code>，但是再讲之前，我们需要先了解一下 什么是左值、什么是右值</p>
+<blockquote>
+<p><strong>补充知识点：什么是左值？什么是右值？</strong></p>
+<p>在 C++11 之前，每次传递对象都会触发极其昂贵的“深拷贝（Deep Copy）”。为了解决这个问题，语言引入了右值引用的概念。其核心逻辑是：<strong>如果我发现一个对象“马上就要消亡了”，那我就不拷贝它，而是直接把它的底层内存指针“偷”过来。</strong> 区分谁能被偷、谁不能被偷，就是左值和右值的核心意义。</p>
+<h4 id="1-左值-Lvalue-Locator-Value">1. 左值 (Lvalue - Locator Value)</h4>
+<ul>
+<li>
+<p><strong>本质</strong>：它在内存栈中有一个明确的、持久的物理地址，你可以反复通过这个名字去访问它</p>
+</li>
+<li>
+<p><strong>判别法</strong>：能不能用 <code>&amp;</code> 对它进行取地址？能取地址的，就是左值</p>
+</li>
+<li>
+<p><strong>代码示例</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> a = <span class="hljs-number">10</span>;       <span class="hljs-comment">// &#x27;a&#x27; 是左值，你可以对它执行 &amp;a</span><br><span class="hljs-function">Tensor <span class="hljs-title">t</span><span class="hljs-params">(<span class="hljs-string">&quot;X&quot;</span>)</span></span>;    <span class="hljs-comment">// &#x27;t&#x27; 是左值，它安稳地活在栈上，生命周期直到作用域结束</span><br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>拷贝策略</strong>：因为左值还要继续存活，别人可能还要用它，所以<strong>绝对不能偷它的资源</strong>，只能老老实实对它进行“深拷贝”</p>
+</li>
+</ul>
+<h4 id="2-右值-Rvalue-Read-Value-Temporary">2. 右值 (Rvalue - Read Value / Temporary)</h4>
+<ul>
+<li>
+<p><strong>本质</strong>：它通常只是 CPU 寄存器里的一个<strong>临时计算结果</strong>，或者表达式产生的一个<strong>临时对象</strong>。一旦这行代码执行结束，它立马就会灰飞烟灭。</p>
+</li>
+<li>
+<p><strong>判别法</strong>：<strong>无法</strong>用 <code>&amp;</code> 对它取地址。</p>
+</li>
+<li>
+<p><strong>代码示例</strong>：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-type">int</span> a = <span class="hljs-number">10</span>;<br><span class="hljs-type">int</span> b = <span class="hljs-number">20</span>;<br><span class="hljs-comment">// &#x27;a + b&#x27; 算出来的那个结果 30，在赋值给 c 之前，就是一个右值。你无法对 &amp;(a+b) 取地址。</span><br><span class="hljs-type">int</span> c = a + b; <br><br>Tensor t = <span class="hljs-built_in">Tensor</span>(<span class="hljs-string">&quot;Y&quot;</span>);  <span class="hljs-comment">// &#x27;Tensor(&quot;Y&quot;)&#x27; 是一个临时构建的右值对象，一旦赋值完成就死了。</span><br></code></pre></td></tr></table></figure>
+</li>
+<li>
+<p><strong>拷贝策略（窃取）</strong>：既然右值马上就要死了，里面包含的（比如几十 MB 的堆内存指针）直接销毁太浪费了。我们完全可以触发<strong>移动构造（Move Constructor）</strong>，光明正大地把它的底层指针“偷”过来据为己有，反正它死后也不会有人再访问它。</p>
+</li>
+</ul>
+</blockquote>
+<p>回到最初的问题：我想把一块内存传给另一个函数去处理，但是由于这块内存存放的是左值，我们无法去“偷”他的资源，该怎么办？</p>
+<p>这时候就需要用到 <code>std::move</code>：</p>
+<ul>
+<li>比如我需要复制一份<code>t1</code>：调用<code>std::move(t1)</code> 时，它其实在底层<strong>什么都没做（不发生任何真实移动）</strong>，仅仅进行了一个类型转换 —— 把一个坚挺的左值 <code>t1</code>，强行转型成了一个右值（引用 <code>T&amp;&amp;</code>）</li>
+<li>编译器一看 “是个右值了”，就会立刻激活后续的构造函数，把 <code>t1</code> 的资源合法地窃取走</li>
+</ul>
+<h2 id="总结">总结</h2>
+<p>把这四个场景串起来， 就是<code>unique_ptr</code> 的本质思想：</p>
+<ol>
+<li><strong>裸指针</strong>太危险，动辄内存泄漏</li>
+<li>于是我们用**栈对象的生命周期（RAII）**把它包起来，死的时候自动释放</li>
+<li>但包起来后怕被别人<strong>复制</strong>，而导致两次释放（Double Free），所以我们 <strong>禁止 Copy</strong></li>
+<li>禁止 Copy 后没法传递了，于是我们采用另一种方法： <strong>移动（Move）</strong>—— 它只传递，不复制</li>
+</ol>
+<h2 id="代码">代码</h2>
+<h3 id="my-unique-ptr-hpp">my_unique_ptr.hpp</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> once</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;utility&gt;</span> <span class="hljs-comment">// for std::move, std::exchange</span></span><br><br><span class="hljs-keyword">namespace</span> ai_infra &#123;<br><br><span class="hljs-comment">// 模板，代表这个删除器可以处理任意类型 T 的指针</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <br><span class="hljs-keyword">struct</span> <span class="hljs-title class_">DefaultDeleter</span> &#123; <span class="hljs-comment">// 默认的 Deleter，后续可以根据需要进行扩展</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">operator</span><span class="hljs-params">()</span><span class="hljs-params">(T* ptr)</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-comment">// 重载括号运算符，以后可以直接使用 DefaultDeleter&lt;int&gt; del; del(ptr);</span><br>        <span class="hljs-keyword">if</span>(ptr) &#123;<br>            <span class="hljs-keyword">delete</span> ptr; <span class="hljs-comment">// delete：1.调用析构函数（如果有）2. free</span><br>        &#125;<br>    &#125;<br>&#125;;<br>    <br><span class="hljs-comment">// 定义带有自定义 Deleter 模板参数的 unique_ptr</span><br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T, <span class="hljs-keyword">typename</span> Deleter = DefaultDeleter&lt;T&gt;&gt;<br><span class="hljs-keyword">class</span> unique_ptr &#123;<br><span class="hljs-keyword">private</span>:<br>    T* ptr_; <span class="hljs-comment">// 裸指针</span><br>    Deleter deleter_; <span class="hljs-comment">// 删除器实例</span><br>    <br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// ----- 构造与析构 -----</span><br>    <span class="hljs-comment">// constexpr：表示在编译期就能算出来，用于极致优化</span><br>    <span class="hljs-comment">// noexcept：向编译器保证这个函数绝对不会抛出异常。编译器看到它，就会省去很多生成异常处理栈展开的底层代码</span><br>    <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-title">unique_ptr</span><span class="hljs-params">()</span> <span class="hljs-keyword">noexcept</span> : ptr_(nullptr) &#123;</span>&#125;<br>    <br>    <span class="hljs-comment">// 显式指针构造函数，用于获取资源</span><br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">unique_ptr</span><span class="hljs-params">(T* p)</span> <span class="hljs-keyword">noexcept</span> : ptr_(p) &#123;</span>&#125;<br>    <br>    <span class="hljs-comment">// 析构函数</span><br>    ~<span class="hljs-built_in">unique_ptr</span>() &#123;<br>        <span class="hljs-built_in">deleter_</span>(ptr_); <span class="hljs-comment">// 利用 deleter_ 安全释放 ptr_</span><br>    &#125;<br>    <br>    <span class="hljs-comment">// ----- 独占所有权 -----</span><br>    <span class="hljs-comment">// 显式禁止 “拷贝构造函数” 和 “拷贝赋值运算符”，防止重复释放</span><br>    <span class="hljs-built_in">unique_ptr</span>(<span class="hljs-type">const</span> unique_ptr&amp; other) = <span class="hljs-keyword">delete</span>;<br>    unique_ptr&amp; <span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> unique_ptr&amp; other) = <span class="hljs-keyword">delete</span>;<br><br>	<span class="hljs-comment">// ----- 资源转换（移动语义）-----</span><br>    <span class="hljs-comment">// 这里的 other 代表一个“即将消亡的值”（比如临时变量，或者被 std::move 强制转换的变量）</span><br>    <span class="hljs-comment">// std::exchange(a, b)：把 a 的旧值返回，然后把 b 赋值给 a。在这里，它等价于：this-&gt;ptr_ = other.ptr_; other.ptr_ = nullptr;</span><br>    <span class="hljs-built_in">unique_ptr</span>(unique_ptr&amp;&amp; other) <span class="hljs-keyword">noexcept</span> <br>    : <span class="hljs-built_in">ptr_</span>(std::<span class="hljs-built_in">exchange</span>(other.ptr_, <span class="hljs-literal">nullptr</span>)), <br>      <span class="hljs-built_in">deleter_</span>(std::<span class="hljs-built_in">move</span>(other.deleter_)) &#123;&#125;<br>    <br>    <span class="hljs-comment">// 移动赋值运算符</span><br>    <span class="hljs-comment">// 注意逻辑：先释放自己原有的资源，再去偷 other 的资源</span><br>    unique_ptr&amp; <span class="hljs-keyword">operator</span>=(unique_ptr&amp;&amp; other) <span class="hljs-keyword">noexcept</span> &#123;<br>        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span> != &amp;other) &#123; <span class="hljs-comment">// 防止自赋值</span><br>            <span class="hljs-built_in">deleter_</span>(ptr_); <span class="hljs-comment">// 先释放自己的资源</span><br>            <span class="hljs-comment">// 偷 other 资源</span><br>            ptr_ = std::<span class="hljs-built_in">exchange</span>(other.ptr_, <span class="hljs-literal">nullptr</span>);<br>            deleter_ = std::<span class="hljs-built_in">move</span>(other.deleter_);<br>        &#125;<br>        <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// ----- 底层指针操作 -----</span><br>    <span class="hljs-comment">// 重载解引用，目的是为了让它用起来像原生指针一样</span><br>    T&amp; <span class="hljs-keyword">operator</span>*() <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> *ptr_; &#125;<br>    T* <span class="hljs-keyword">operator</span>-&gt;() <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> ptr_; &#125;<br>    <br>    <span class="hljs-comment">// 获取底层裸指针</span><br>    <span class="hljs-function">T* <span class="hljs-title">get</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> ptr_; &#125;<br>    <br>    <span class="hljs-comment">// 实现 reset 逻辑：注意要先释放旧资源，然后接管新指针</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">reset</span><span class="hljs-params">(T* p = <span class="hljs-literal">nullptr</span>)</span> <span class="hljs-keyword">noexcept</span> </span>&#123;<br>        T* old_ptr = std::<span class="hljs-built_in">exchange</span>(ptr_, p);<br>        <span class="hljs-built_in">deleter_</span>(old_ptr);<br>    &#125; <span class="hljs-comment">// 这里不直接 deleter_(ptr_); ptr_ = p; 的原因是为了防止重置同一个指针（如 p1.reset(p1.get())）导致先被释放的 Bug</span><br>    <br>    <span class="hljs-comment">// 实现 release 逻辑：不再管理该资源，由调用者手动 delete</span><br>    <span class="hljs-function">T* <span class="hljs-title">release</span><span class="hljs-params">()</span> <span class="hljs-keyword">noexcept</span> </span>&#123;<br>        <span class="hljs-comment">// 放弃所有权，拿走当前指针，内部置为空，并把拿走的指针返回给外界</span><br>        <span class="hljs-keyword">return</span> std::<span class="hljs-built_in">exchange</span>(ptr_, <span class="hljs-literal">nullptr</span>);<br>    &#125;<br>&#125;;<br>    <br>&#125; <span class="hljs-comment">// namespace ai_infra</span><br></code></pre></td></tr></table></figure>
+<h3 id="test-unique-ptr-cpp">test_unique_ptr.cpp</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;01_my_unique_ptr.hpp&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-comment">// 我们的“靶子”类：模拟深度学习中的 Tensor</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Tensor</span> &#123;<br><span class="hljs-keyword">public</span>:<br>  	string name_;<br><br>  	<span class="hljs-built_in">Tensor</span>(string name) : <span class="hljs-built_in">name_</span>(name) &#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot;[Tensor] &quot;</span> &lt;&lt; name_ &lt;&lt; <span class="hljs-string">&quot; 被创建，分配 1GB 显存！&quot;</span> &lt;&lt; endl;<br>  	&#125;<br><br>  	~<span class="hljs-built_in">Tensor</span>() &#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot;[Tensor] &quot;</span> &lt;&lt; name_ &lt;&lt; <span class="hljs-string">&quot; 被销毁，释放 1GB 显存！&quot;</span> &lt;&lt; endl;<br>  	&#125;<br><br>  	<span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">compute</span><span class="hljs-params">()</span> </span>&#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot;  -&gt; [计算图] &quot;</span> &lt;&lt; name_ &lt;&lt; <span class="hljs-string">&quot; 正在执行矩阵乘法...&quot;</span> &lt;&lt; endl;<br>  	&#125;<br>&#125;;<br><br><span class="hljs-comment">// 模拟一个算子执行引擎，它要求强制接管 Tensor 的所有权</span><br><span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">run_compute</span><span class="hljs-params">(ai_infra::unique_ptr&lt;Tensor&gt; t)</span> </span>&#123;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 【算子引擎】成功夺取所有权！开始处理...&quot;</span> &lt;&lt; endl;<br>  	t-&gt;<span class="hljs-built_in">compute</span>();<br>  	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 【算子引擎】处理完毕，引擎即将关闭，局部变量 t 马上要死亡...&quot;</span> &lt;&lt; endl;<br>&#125; <span class="hljs-comment">// t 在这里离开作用域，触发 RAII 释放！</span><br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;------------- RAII 自动释放测试 -------------&quot;</span> &lt;&lt; endl;<br>  	&#123;<br>    	<span class="hljs-function">ai_infra::unique_ptr&lt;Tensor&gt; <span class="hljs-title">ptr1</span><span class="hljs-params">(<span class="hljs-keyword">new</span> Tensor(<span class="hljs-string">&quot;Tensor_A&quot;</span>))</span></span>;<br>    	ptr1-&gt;<span class="hljs-built_in">compute</span>();<br>    	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 准备离开作用域...&quot;</span> &lt;&lt; endl;<br>  	&#125; <span class="hljs-comment">// 期待：在这里自动调用 Tensor_A 的析构函数</span><br>  	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 成功离开作用域！(如果你看到上面输出了释放信息，说明 RAII 成功！)&quot;</span>&lt;&lt; endl;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;------------- 防 Copy 编译拦截测试 -------------&quot;</span> &lt;&lt; endl;<br>  	<span class="hljs-function">ai_infra::unique_ptr&lt;Tensor&gt; <span class="hljs-title">ptr2</span><span class="hljs-params">(<span class="hljs-keyword">new</span> Tensor(<span class="hljs-string">&quot;Tensor_B&quot;</span>))</span></span>;<br><br>  	<span class="hljs-comment">// 你可以试着把下面这行代码取消注释，然后尝试编译。</span><br>  	<span class="hljs-comment">// 如果你写的 unique_ptr(const unique_ptr&amp;) = delete 生效了，编译器会报错！</span><br>  	<span class="hljs-comment">// ai_infra::unique_ptr&lt;Tensor&gt; ptr3 = ptr2;</span><br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 拷贝行为已被编译器严格拦截（详见代码注释）。&quot;</span> &lt;&lt; endl;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;------------- Move 所有权转移测试 -------------&quot;</span> &lt;&lt; endl;<br>  	<span class="hljs-function">ai_infra::unique_ptr&lt;Tensor&gt; <span class="hljs-title">ptr4</span><span class="hljs-params">(<span class="hljs-keyword">new</span> Tensor(<span class="hljs-string">&quot;Tensor_C&quot;</span>))</span></span>;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 主函数：准备把 Tensor_C 交给底层算子引擎处理&quot;</span> &lt;&lt; endl;<br>  	<span class="hljs-comment">// 注意：不能直接传 ptr4，必须用 std::move</span><br>  	<span class="hljs-comment">// 伪装成右值，触发移动构造函数（窃取）！</span><br>  	<span class="hljs-built_in">run_compute</span>(std::<span class="hljs-built_in">move</span>(ptr4));<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;  &gt;&gt;&gt; 主函数：底层算子引擎执行完毕，控制权回到主函数&quot;</span> &lt;&lt; endl;<br><br>  	<span class="hljs-comment">// 验证窃取是否成功，原指针是否被置空</span><br>  	<span class="hljs-keyword">if</span> (ptr<span class="hljs-number">4.</span><span class="hljs-built_in">get</span>() == <span class="hljs-literal">nullptr</span>) &#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot; 所有权已交出！ptr4 内部指针已被 std::exchange 安全清空&quot;</span> &lt;&lt; endl;<br>  	&#125; <span class="hljs-keyword">else</span> &#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot; 所有权未交出，内部指针未清空&quot;</span> &lt;&lt; endl;<br>  	&#125;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;\n----------- 测试结束 -----------&quot;</span> &lt;&lt; endl;<br>  	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="面试题">面试题</h2>
+<h3 id="请谈谈你对-C-智能指针和内存管理的理解？">请谈谈你对 C++ 智能指针和内存管理的理解？</h3>
+<h4 id="一、点出核心-——-RAII-与确定性">一、点出核心 —— RAII 与确定性</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>“C++ 内存管理的核心哲学是 <strong>RAII（资源获取即初始化）</strong>。在 AI 底层系统（如算子开发）中，我们追求绝对的性能和可控性，因此不能依赖像 Java 那样有停顿的垃圾回收器（GC）</p>
+<p>RAII 的精髓在于：把堆内存、CUDA 显存、互斥锁等系统资源的生命周期，强行绑定到栈上局部变量的作用域中。利用 C++ <strong>离开作用域必定触发析构函数</strong>的确定性机制，实现了无死角、具备异常安全（Exception Safe）的自动资源回收”</p>
+</blockquote>
+<h4 id="二、深度剖析-——独占与零开销">二、深度剖析 ——独占与零开销</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>“在使用场景中最推荐的是 <code>std::unique_ptr</code>，它的主要标志是**‘独占所有权’<strong>与</strong>‘零开销’**</p>
+<ol>
+<li><strong>关于独占</strong>：在底层源码实现中，它通过 <code>= delete</code> 显式禁用了拷贝构造和拷贝赋值，从语法层面上彻底杜绝了两个指针指向同一块内存而导致的 Double Free（重复释放）问题。巧妙地把一个<strong>运行时灾难</strong>，提前拦截成了<strong>编译期错误</strong></li>
+<li><strong>关于流转</strong>：当需要转移某个计算图节点的所有权时，可以采用 <code>std::move</code> 强制将其转换为右值，触发<strong>移动语义（Move Semantics）</strong>。底层仅仅是做了一个极低成本的指针接管，并将原对象的指针安全置空（置空操作通常用 <code>std::exchange</code> 实现）</li>
+<li><strong>关于零开销</strong>：如果使用默认删除器，<code>unique_ptr</code> 在运行时的内存大小和普通的裸指针（通常是 8 字节）完全一致，没有任何性能损耗”</li>
+</ol>
+</blockquote>
+<h4 id="三、拓展-——-自定义-Deleter-的系统级应用">三、拓展 —— 自定义 Deleter 的系统级应用</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>“除了管理普通的堆内存，<code>unique_ptr</code> 更强大的地方在于它是一个泛型的<strong>资源守卫（Resource Guard）</strong>。通过传入自定义的 Deleter（删除器），我们可以用它来管理异构计算的资源。</p>
+<p>比如在写 Triton 或 CUDA 底层扩展时，我可以定制一个内部调用 <code>cudaFree</code> 的删除器；在处理网络层时，可以定制一个调用 <code>fclose</code> 或关闭 Socket 的删除器。它统一了整个系统的资源生命周期流转。”</p>
+</blockquote>
+<h3 id="可能追问的小细节：">可能追问的小细节：</h3>
+<ol>
+<li><strong>为什么移动构造/赋值函数通常要加 <code>noexcept</code>？</strong>
+<ul>
+<li><strong>答</strong>：因为在转移资源所有权（仅仅是挪动几个指针）的过程中，逻辑上不应该也不可能抛出异常。加上 <code>noexcept</code> 可以让标准库容器（如 <code>std::vector</code>）在扩容重分配时，放心地调用移动构造函数而不是退化为缓慢的拷贝构造函数。</li>
+</ul>
+</li>
+<li><strong>在手写移动赋值 <code>operator=</code> 时，最容易忽略什么？</strong>
+<ul>
+<li><strong>答</strong>：有两个致命点：一是忘记检查<strong>自我赋值</strong>（<code>if (this == &amp;other)</code>），如果自己移给自己，先把当前资源释放了，后面就全乱套了；二是应该<strong>先释放自己现有的资源</strong>再去接管别人的资源，防止现有资源泄漏。</li>
+</ul>
+</li>
+</ol>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C/" class="category-chain-item">C++</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C/" class="print-no-link">#C++</a>
+      
+        <a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/" class="print-no-link">#编译器</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C++ unique_ptr</div>
+      <div>https://laojiao1.github.io/2026/07/07/Compiler/C++/1. C++ unique_ptr/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月7日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/04/Compiler/C++/0.%20C++%20%E6%8C%87%E9%92%88%E7%B2%BE%E8%AE%B2/" title="C++ 指针精讲">
+                        <span class="hidden-mobile">C++ 指针精讲</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
