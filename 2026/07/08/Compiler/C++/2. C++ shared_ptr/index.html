@@ -1,0 +1,823 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="2. C++ shared_ptr 引入 在神经网络里，经常有一种结构叫做“残差连接（Residual Connection）” 假设我们有一个图像输入的特征张量 Tensor X。在计算图中，它同时被另外三个算子节点依赖：  Op A (卷积层 1) 需要读取 Tensor X Op B (卷积层 2) 需要读取 Tensor X Op C (加法节点) 也需要读取 Tensor X  这样就会">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C++ shared_ptr">
+<meta property="og:url" content="https://laojiao1.github.io/2026/07/08/Compiler/C++/2.%20C++%20shared_ptr/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="2. C++ shared_ptr 引入 在神经网络里，经常有一种结构叫做“残差连接（Residual Connection）” 假设我们有一个图像输入的特征张量 Tensor X。在计算图中，它同时被另外三个算子节点依赖：  Op A (卷积层 1) 需要读取 Tensor X Op B (卷积层 2) 需要读取 Tensor X Op C (加法节点) 也需要读取 Tensor X  这样就会">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/algorithm/C++/image.png">
+<meta property="article:published_time" content="2026-07-08T07:17:12.916Z">
+<meta property="article:modified_time" content="2026-07-08T07:17:12.916Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/algorithm/C++/image.png">
+  
+  
+  
+  <title>C++ shared_ptr - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="C++ shared_ptr"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-07-08 15:17" pubdate>
+          2026年7月8日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          26 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">C++ shared_ptr</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>2. C++ shared_ptr</h1>
+<h2 id="引入">引入</h2>
+<p>在神经网络里，经常有一种结构叫做“残差连接（Residual Connection）”</p>
+<p>假设我们有一个图像输入的特征张量 <strong><code>Tensor X</code></strong>。在计算图中，它同时被另外三个算子节点依赖：</p>
+<ol>
+<li><strong><code>Op A</code></strong> (卷积层 1) 需要读取 <code>Tensor X</code></li>
+<li><strong><code>Op B</code></strong> (卷积层 2) 需要读取 <code>Tensor X</code></li>
+<li><strong><code>Op C</code></strong> (加法节点) 也需要读取 <code>Tensor X</code></li>
+</ol>
+<p><strong>这样就会引出一个问题</strong>：</p>
+<ul>
+<li><strong>如果用裸指针</strong>：到底该由谁来 <code>delete</code> 掉 <code>Tensor X</code>？如果 <code>Op A</code> 执行完顺手把它删了，<code>Op B</code> 和 <code>Op C</code> 就会因为访问“悬垂指针”而直接导致整个 PyTorch 进程崩溃。如果大家都不删，1GB 的显存就泄漏了。</li>
+<li><strong>如果用 <code>unique_ptr</code></strong>：不好意思，<code>unique_ptr</code> 叫“独占所有权”。如果把 <code>Tensor X</code> 给了 <code>Op A</code>，<code>Op B</code> 和 <code>Op C</code> 连碰它的资格都没有。</li>
+</ul>
+<p>面对这种**“一份数据，多人共享”**的复杂拓扑结构，我们急需一种全新的机制</p>
+<h3 id="技术破局-——-引用计数与最后关灯法则">技术破局 —— 引用计数与最后关灯法则</h3>
+<p>前人想出的解决思路极其优雅，生活里也极其常见，我称之为**“最后离开会议室的人负责关灯”**法则</p>
+<p>我们需要一种**引用计数（Reference Counting）**机制：</p>
+<ol>
+<li>初始状态：<code>Tensor X</code> 被创建出来，当前有 1 个人看着它（引用计数 = 1）</li>
+<li>共享行为：<code>Op A</code>、<code>Op B</code>、<code>Op C</code> 都想用它，每一次有人引用它，就把数字加 1（引用计数 = 4）</li>
+<li>离开行为：<code>Op A</code> 计算完了，不再需要 <code>Tensor X</code>，就把数字减 1（引用计数 = 3）</li>
+<li><strong>终极裁决</strong>：当最后一个依赖它的算子执行完毕，执行减 1 操作时，发现<strong>引用计数变成了 0</strong>。这就意味着大厅里空无一人了，这最后一个人（最后析构的 <code>shared_ptr</code>）负责顺手把 <code>Tensor X</code> 给 <code>delete</code> 掉（关灯）</li>
+</ol>
+<h3 id="为什么要拆分出一个“控制块”？">为什么要拆分出一个“控制块”？</h3>
+<p>为了实现上面这个计数功能，我们来做一个思想实验：</p>
+<p>假如你在手写 <code>shared_ptr</code> 类，最初的想法可能是这样的</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">shared_ptr</span> &#123;<br>    T* ptr_;      <span class="hljs-comment">// 指向真实数据的指针</span><br>    <span class="hljs-type">int</span> count_;   <span class="hljs-comment">// 用一个整数存引用计数</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>**可以先思考一个问题：**如果像上面那样，直接把 <code>int count_</code> 作为一个普通成员变量塞进 <code>shared_ptr</code> 类里，当发生拷贝（比如 <code>shared_ptr p2 = p1;</code>）时，会产生什么样的问题？</p>
+<blockquote>
+<p>我们来脑内模拟一下，如果你试图在拷贝时去改变它，会发生怎样可怕的事情：</p>
+<p>假设 <code>p1</code> 活在主函数的栈上，它肚子里有 <code>count_ = 1</code></p>
+<p>接着，我们把 <code>p1</code> 拷贝给了 <code>p2</code> (<code>shared_ptr p2 = p1</code>)。此时，就算我们在拷贝构造函数里写了让计数器加 1 的逻辑，结果会变成：</p>
+<ul>
+<li><code>p1</code> 肚子里的 <code>count_</code> 变成了 2</li>
+<li><code>p2</code> 肚子里的 <code>count_</code> 变成了 2</li>
+</ul>
+<p>注意！这两个 <code>count_</code> 是分别存在于两段完全不同的物理内存（栈内存）里的<strong>两个独立的整数</strong>！</p>
+<p>如果此时，主函数里又创建了 <code>p3 = p1</code>。<code>p1</code> 和 <code>p3</code> 肚子里的计数变成了 3。<strong>但是 <code>p2</code> 根本不知道这件事！</strong> <code>p2</code> 肚子里的数字还是可怜的 2</p>
+<p>更可怕的是，当 <code>p1</code> 销毁时，它的计数减去了 1，但这完全影响不到 <code>p2</code> 和 <code>p3</code>。最终大家的计数彻底乱套，要么提前释放导致野指针，要么永远不释放导致内存泄漏</p>
+</blockquote>
+<h3 id="终极架构——引出“控制块-Control-Block-”">终极架构——引出“控制块 (Control Block)”</h3>
+<p>既然所有的 <code>shared_ptr</code> 都必须紧盯同一个计数器，那么这个计数器<strong>绝不能长在某一个智能指针的肚子里（栈上），它必须被独立出来，放在所有指针都能看到的地方（堆上）</strong>！</p>
+<p>这就是 C++ 标准库给出的完美架构：</p>
+<p>当你第一次创建一个 <code>shared_ptr</code> 时，它在底层其实做了<strong>两次</strong>内存分配（这也是为什么说 <code>shared_ptr</code> 开销比 <code>unique_ptr</code> 大的原因）：</p>
+<ol>
+<li>申请一块堆内存，存你的真实数据（比如 Tensor）</li>
+<li><strong>额外申请一块极小的堆内存，叫做“控制块（Control Block）”</strong>，里面存着唯一的引用计数 <code>count_</code></li>
+</ol>
+<p>所以，一个真正的 <code>std::shared_ptr</code> 肚子里其实藏着<strong>两个裸指针</strong>：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-keyword">template</span>&lt;<span class="hljs-keyword">typename</span> T&gt;<br><span class="hljs-keyword">class</span> <span class="hljs-title class_">shared_ptr</span> &#123;<br>    T*   ptr_;            <span class="hljs-comment">// 指针 1：指向真实的 1GB 显存数据</span><br>    <span class="hljs-type">int</span>* control_block_;  <span class="hljs-comment">// 指针 2：指向大家共享的那个“计分板”（控制块）</span><br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>这样一来，不管你克隆（Copy）出 100 个还是一万个 <code>shared_ptr</code>，大家的 <code>control_block_</code> 指针都指向同一块内存。无论谁去修改计数，所有人看到的永远是最实时的全局状态</p>
+<p>难点在于：在构造函数、拷贝构造、拷贝赋值、甚至析构函数里，同时小心翼翼地维护这两个指针！</p>
+<h2 id="骨架设计">骨架设计</h2>
+<ol>
+<li><strong>底层变量（双指针架构）</strong>
+<ul>
+<li>我们需要 <code>T* ptr_</code>（指向真实数据）和 <code>size_t* ref_count_</code>（指向堆上的控制块）</li>
+</ul>
+</li>
+<li><strong>辅助函数 <code>release_resource()</code></strong>
+<ul>
+<li>在释放前，先把 <code>ref_count_</code> 里的数字减 1。如果减到了 0，说明你是最后一个人，此时不仅要 <code>delete ptr_</code>（清理数据），还<strong>绝对不能忘记 <code>delete ref_count_</code>（清理计数器本身）</strong>！</li>
+</ul>
+</li>
+<li><strong>显式构造函数</strong>
+<ul>
+<li>第一次接管裸指针时，不仅要赋值 <code>ptr_</code>，还必须要在堆上 <code>new</code> 出一个整数作为控制块，并初始化为 1</li>
+</ul>
+</li>
+<li><strong>析构函数</strong>
+<ul>
+<li>不能无脑 <code>delete</code> 数据了，只能调用上面的 <code>release_resource()</code> 进行“试探性退场”</li>
+</ul>
+</li>
+<li><strong>拷贝构造函数</strong>
+<ul>
+<li>直接复制两个指针，并把堆上的计数器数字加 1</li>
+</ul>
+</li>
+<li><strong>拷贝赋值运算符</strong>
+<ul>
+<li>当执行 <code>p1 = p2</code> 时，<code>p1</code> 必须先放弃自己以前的资源（栈上的引用数减 1，如果为0还需要清理空间），然后再去复制 <code>p2</code> 的指针，并让 <code>p2</code> 会议室的人数加 1。注意千万别忘了防止自我赋值！</li>
+</ul>
+</li>
+</ol>
+<h2 id="代码">代码</h2>
+<h3 id="shared-ptr">shared_ptr</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> once</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;utility&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstddef&gt;</span></span><br><br><span class="hljs-keyword">namespace</span> ai_infra &#123;<br>    <br><span class="hljs-keyword">template</span> &lt;<span class="hljs-keyword">typename</span> T&gt; <span class="hljs-keyword">class</span> <span class="hljs-title class_">shared_ptr</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    T *ptr_; <span class="hljs-comment">// 指向真实数据的裸指针</span><br>    <span class="hljs-type">size_t</span> *ref_count_; <span class="hljs-comment">// 指向堆上分配的“控制块计数器”</span><br>    <br>    <span class="hljs-comment">// 资源释放</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">release_resource</span><span class="hljs-params">()</span> </span>&#123;<br>        <span class="hljs-keyword">if</span>(ref_count_) &#123;<br>            (*ref_count_)--; <span class="hljs-comment">// 计数器-1</span><br>            <br>            <span class="hljs-keyword">if</span>(*ref_count_ == <span class="hljs-number">0</span>) &#123; <span class="hljs-comment">// 如果是最后一个</span><br>                <span class="hljs-comment">// 释放数据</span><br>                <span class="hljs-keyword">delete</span> ptr_;<br>                <span class="hljs-keyword">delete</span> ref_count_;<br>                <br>                <span class="hljs-comment">// 一定要记得置空！防止野指针！</span><br>                ptr_ = <span class="hljs-literal">nullptr</span>;<br>                ref_count_ = <span class="hljs-literal">nullptr</span>;<br>            &#125;<br>        &#125;<br>    &#125;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// ----- 构造与析构 -----</span><br>    <span class="hljs-comment">// 构造函数初始化</span><br>    <span class="hljs-function"><span class="hljs-keyword">constexpr</span> <span class="hljs-title">shared_ptr</span><span class="hljs-params">()</span> <span class="hljs-keyword">noexcept</span> : ptr_(nullptr),</span><br><span class="hljs-function">    								ref_count_(nullptr) &#123;</span>&#125;<br>    <br>    <span class="hljs-comment">// 构造函数，接管裸指针</span><br>    <span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">shared_ptr</span><span class="hljs-params">(T *p)</span> : ptr_(p) &#123;</span><br>        <span class="hljs-keyword">if</span>(p) &#123;<br>            <span class="hljs-comment">// 如果有数据在堆上，new一个控制块，并初始化计数器为1</span><br>            ref_count_ = <span class="hljs-keyword">new</span> <span class="hljs-built_in">size_t</span>(<span class="hljs-number">1</span>);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            ref_count_ = <span class="hljs-literal">nullptr</span>;<br>        &#125;<br>    &#125;<br>    <br>    <span class="hljs-comment">// 析构函数</span><br>    ~<span class="hljs-built_in">shared_ptr</span>() &#123;<br>        <span class="hljs-built_in">release_resource</span>();<br>    &#125;<br>    <br>    <span class="hljs-comment">// ----- 拷贝语义 -----</span><br>    <span class="hljs-built_in">shared_ptr</span>(<span class="hljs-type">const</span> shared_ptr &amp;other) <span class="hljs-keyword">noexcept</span> :<br>    	<span class="hljs-built_in">ptr_</span>(other.ptr_), <span class="hljs-built_in">ref_count_</span>(other.ref_count_) &#123;<br>            <span class="hljs-keyword">if</span>(ref_count_) &#123;<br>                (*ref_count_)++;<br>            &#125;<br>    &#125;<br>    <br>    <span class="hljs-comment">// 重构拷贝赋值运算符</span><br>    shared_ptr &amp;<span class="hljs-keyword">operator</span>=(<span class="hljs-type">const</span> shared_ptr &amp;other) <span class="hljs-keyword">noexcept</span> &#123;<br>        <span class="hljs-comment">// 防止自赋值</span><br>        <span class="hljs-keyword">if</span>(<span class="hljs-keyword">this</span> != &amp;other) &#123;<br>            <span class="hljs-comment">// 先释放当前资源</span><br>            <span class="hljs-built_in">release_resource</span>();<br>            <br>            <span class="hljs-comment">// 然后接管 other 的资源</span><br>            <span class="hljs-keyword">this</span>-&gt;ptr_ = other.ptr_;<br>            <span class="hljs-keyword">this</span>-&gt;ref_count_ = other.ref_count_;<br>            <br>            <span class="hljs-comment">// 对应新控制块的计数值 + 1</span><br>          	<span class="hljs-keyword">if</span> (ref_count_) &#123;<br>            	(*ref_count_)++;<br>          	&#125;<br>        &#125;<br>        <span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// ----- 移动语义 -----</span><br>    <span class="hljs-comment">// 移动构造函数（单纯的窃取，不需要操作 ref_count_ 里的数字）</span><br>    <span class="hljs-built_in">shared_ptr</span>(shared_ptr &amp;&amp;other) <span class="hljs-keyword">noexcept</span><br>       	: <span class="hljs-built_in">ptr_</span>(std::<span class="hljs-built_in">exchange</span>(other.ptr_, <span class="hljs-literal">nullptr</span>)),<br>    		<span class="hljs-built_in">ref_count_</span>(std::<span class="hljs-built_in">exchange</span>(other.ref_count_, <span class="hljs-literal">nullptr</span>))&#123;&#125;<br>    <br>    <span class="hljs-comment">// 移动赋值运算符</span><br>    shared_ptr &amp;<span class="hljs-keyword">operator</span>=(shared_ptr &amp;&amp;other) <span class="hljs-keyword">noexcept</span> &#123;<br>        <span class="hljs-keyword">if</span> (<span class="hljs-keyword">this</span> != &amp;other) &#123;<br>            <span class="hljs-comment">// 做法同上，注意这里不需要处理 ref_count_</span><br>      		<span class="hljs-built_in">release_resource</span>(); <br>      		ptr_ = std::<span class="hljs-built_in">exchange</span>(other.ptr_, <span class="hljs-literal">nullptr</span>);<br>      		ref_count_ = std::<span class="hljs-built_in">exchange</span>(other.ref_count_, <span class="hljs-literal">nullptr</span>);<br>    	&#125;<br>		<span class="hljs-keyword">return</span> *<span class="hljs-keyword">this</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// ----- 一些辅助操作 -----</span><br>    <span class="hljs-comment">// 获取引用数</span><br>    <span class="hljs-function"><span class="hljs-type">size_t</span> <span class="hljs-title">use_count</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> <span class="hljs-keyword">noexcept</span> </span>&#123;<br>        <span class="hljs-keyword">return</span> ref_count_ ? *ref_count_ : <span class="hljs-number">0</span>;<br>    &#125;<br>    <br>    <span class="hljs-comment">// 重载运算符</span><br>    T &amp;<span class="hljs-keyword">operator</span>*() <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> *ptr_; &#125;<br>    T *<span class="hljs-keyword">operator</span>-&gt;() <span class="hljs-type">const</span> &#123; <span class="hljs-keyword">return</span> ptr_; &#125;<br>    <br>    <span class="hljs-comment">// 获取当前指针</span><br>    <span class="hljs-function">T *<span class="hljs-title">get</span><span class="hljs-params">()</span> <span class="hljs-type">const</span> </span>&#123; <span class="hljs-keyword">return</span> ptr_; &#125;<br>&#125;;<br>    <br>&#125; <span class="hljs-comment">// namespace ai_infra</span><br></code></pre></td></tr></table></figure>
+<h3 id="测试">测试</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;02_my_shared_ptr.hpp&quot;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string&gt;</span></span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Tensor</span> &#123;<br><span class="hljs-keyword">public</span>:<br>    string name_;<br><br>    <span class="hljs-built_in">Tensor</span>(string name) : <span class="hljs-built_in">name_</span>(name) &#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot;[Tensor] &quot;</span> &lt;&lt; name_ &lt;&lt; <span class="hljs-string">&quot; 被创建了，分配物理内存！\n&quot;</span>;<br>    &#125;<br><br>    ~<span class="hljs-built_in">Tensor</span>() &#123;<br>    	cout &lt;&lt; <span class="hljs-string">&quot;[Tensor] &quot;</span> &lt;&lt; name_ &lt;&lt; <span class="hljs-string">&quot; 被彻底销毁了，释放物理内存并关灯！\n&quot;</span>;<br>    &#125;<br>&#125;;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;----- 阶段 1：创建数据 -----&quot;</span> &lt;&lt; endl;<br>  	<span class="hljs-function">ai_infra::shared_ptr&lt;Tensor&gt; <span class="hljs-title">p1</span><span class="hljs-params">(<span class="hljs-keyword">new</span> Tensor(<span class="hljs-string">&quot;Shared_Node&quot;</span>))</span></span>;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; 当前引用人数: &quot;</span> &lt;&lt; p<span class="hljs-number">1.</span><span class="hljs-built_in">use_count</span>() &lt;&lt; <span class="hljs-string">&quot; (预期为 1)&quot;</span> &lt;&lt; endl;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;----- 阶段 2：创建新引用（触发拷贝构造）-----&quot;</span> &lt;&lt; endl;<br>  	ai_infra::shared_ptr&lt;Tensor&gt; p2 = p1;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; p2 进场后，当前引用人数: &quot;</span> &lt;&lt; p<span class="hljs-number">1.</span><span class="hljs-built_in">use_count</span>() &lt;&lt; <span class="hljs-string">&quot; (预期为 2)&quot;</span> &lt;&lt; endl;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;----- 阶段 3：局部作用域（部分人离场）-----&quot;</span> &lt;&lt; endl;<br>  	&#123;<br>    	ai_infra::shared_ptr&lt;Tensor&gt; p3;<br>    	p3 = p1; <span class="hljs-comment">// 触发拷贝赋值</span><br>    	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; p3 进场后，当前引用人数: &quot;</span> &lt;&lt; p<span class="hljs-number">1.</span><span class="hljs-built_in">use_count</span>() &lt;&lt; <span class="hljs-string">&quot; (预期为 3)&quot;</span> &lt;&lt; endl;<br>    	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; p3 准备离开局部作用域...&quot;</span> &lt;&lt; endl;<br>  	&#125; <span class="hljs-comment">// p3 在这里死亡，调用析构函数，内部控制块计数必须减 1</span><br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; p3 已经死亡！当前引用人数: &quot;</span> &lt;&lt; p<span class="hljs-number">1.</span><span class="hljs-built_in">use_count</span>() &lt;&lt; <span class="hljs-string">&quot; (预期为 2)&quot;</span> &lt;&lt; endl;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; (注意：此时绝对不能打印出 Tensor 被销毁的日志，因为 p1 和 p2 还在！)&quot;</span> &lt;&lt; endl;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;----- 阶段 4：强行断开引用（测试赋值重分配） -----&quot;</span>;<br>  	ai_infra::shared_ptr&lt;Tensor&gt; empty_ptr;<br>  	p1 = empty_ptr; <span class="hljs-comment">// p1 强行断开旧连接，变成空壳</span><br>  	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; p1 被强行踢出，此时仅剩 p2 还在里面。&quot;</span> &lt;&lt; endl;<br>  	cout &lt;&lt; <span class="hljs-string">&quot;&gt;&gt;&gt; p2 眼里的引用人数: &quot;</span> &lt;&lt; p<span class="hljs-number">2.</span><span class="hljs-built_in">use_count</span>() &lt;&lt; <span class="hljs-string">&quot; (预期为 1)&quot;</span> &lt;&lt; endl;<br><br>  	cout &lt;&lt; <span class="hljs-string">&quot;----- 阶段 5：主函数结束，最后一个人准备离开 -----&quot;</span> &lt;&lt; endl;<br>  	<span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br><span class="hljs-comment">// p2 在这里死亡，计数终于归 0，触发双重 delete（释放张量 + 释放控制块）</span><br></code></pre></td></tr></table></figure>
+<h2 id="面试题">面试题</h2>
+<h4 id="shared-ptr-的内部结构是怎样的？为什么说它比裸指针“重”？"><code>shared_ptr</code> 的内部结构是怎样的？为什么说它比裸指针“重”？</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>一个标准的 <code>shared_ptr</code> 内部其实包含<strong>两个裸指针</strong>：</p>
+<ul>
+<li>指向真实的堆内存数据</li>
+<li>指向一个动态分配的<strong>控制块（Control Block）</strong>
+<ul>
+<li>控制块里存放了引用计数、弱引用计数以及自定义删除器</li>
+</ul>
+</li>
+</ul>
+<p>因为它需要额外维护这个控制块，所以 <code>sizeof(shared_ptr)</code> 通常是裸指针的两倍（16字节）</p>
+<p>而且在通过 <code>new</code> 构造时，需要进行两次堆内存分配（数据一次，控制块一次），这在极端性能敏感的算子开发中是一笔不可忽视的开销</p>
+</blockquote>
+<h4 id="shared-ptr-是线程安全的吗？（必考）"><code>shared_ptr</code> 是线程安全的吗？（必考）</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>这是一个经典的陷阱，答案是<strong>部分线程安全</strong></p>
+<ol>
+<li><strong>控制块是线程安全的</strong>：底层对引用计数的加减操作使用了<strong>原子操作</strong>，所以多个线程同时拷贝或销毁 <code>shared_ptr</code> 时，计数器绝不会错乱</li>
+<li><strong>内部指向的数据不是线程安全的</strong>：如果多个线程通过 <code>shared_ptr</code> 去读写它所管理的底层的 Tensor 数据，<strong>必须额外加锁</strong></li>
+</ol>
+<p>此外，在高度并发下，控制块的原子操作会导致缓存一致性风暴，也就是 Cache Line 争用，这也正是系统底层推荐使用 <code>unique_ptr</code> 替代 <code>shared_ptr</code> 的原因</p>
+</blockquote>
+<h4 id="如何优化-shared-ptr-的内存分配开销？">如何优化 <code>shared_ptr</code> 的内存分配开销？</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>永远优先使用 <strong><code>std::make_shared</code></strong> 而不是 <code>shared_ptr(new T)</code></p>
+<p>因为 <code>new T</code> 会让真实数据和控制块分散在堆内存的两个不同地方，导致 CPU 缓存命中率（Cache Miss）下降</p>
+<p>而 <code>std::make_shared</code> 会在底层进行一次<strong>内存融合</strong>，申请一块连续的大内存，把数据和控制块放在一起</p>
+<p>这不仅减少了一次内存分配开销，还大幅提升了空间局部性，对性能更友好</p>
+</blockquote>
+<h4 id="shared-ptr-最致命的缺陷是什么？如何解决？"><code>shared_ptr</code> 最致命的缺陷是什么？如何解决？</h4>
+<blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>最致命的是<strong>循环引用（Circular Reference）</strong></p>
+<p>比如在构建复杂的计算图（AST）时，如果父节点拥有子节点的 <code>shared_ptr</code>，而子节点又反向拥有父节点的 <code>shared_ptr</code>，那么两者的引用计数永远无法降到 0，导致内存永久泄漏</p>
+<p>解决方法：引入 <strong><code>std::weak_ptr</code></strong>。它像是 <code>shared_ptr</code> 的一个‘旁观者’，可以观测并访问数据，但<strong>绝对不会增加控制块里的引用计数</strong>。用 <code>weak_ptr</code> 打断循环，就能解决这个问题</p>
+</blockquote>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C/" class="category-chain-item">C++</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C/" class="print-no-link">#C++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>C++ shared_ptr</div>
+      <div>https://laojiao1.github.io/2026/07/08/Compiler/C++/2. C++ shared_ptr/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年7月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/07/Compiler/C++/1.%20C++%20unique_ptr/" title="C++ unique_ptr">
+                        <span class="hidden-mobile">C++ unique_ptr</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
