@@ -1,0 +1,812 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=light>
+
+
+
+<head>
+  <meta charset="UTF-8">
+
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.ico">
+  <link rel="icon" href="/img/favicon.ico">
+  
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#ffffff80">
+  <meta name="author" content="Laojiao">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="4. C++ LRU cache 引入 为什么 AI 引擎需要 Cache？ 在深度学习编译框架（比如 TVM）中，编译一个特定的 GPU 算子（比如“128x128 的半精度矩阵乘法”）非常耗时。 为了加速，一旦某个算子被编译好，我们就想把它存进缓存里。下次碰到一样的算子，直接拿编译好的机器码就行。 问题来了：机器的内存是有限的（假设最多只能存 1000 个算子）。如果缓存满了，而又来了一个新算">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LRU cache">
+<meta property="og:url" content="https://laojiao1.github.io/2026/08/10/Compiler/C++/4.%20C++%20LRU%20cache/index.html">
+<meta property="og:site_name" content="Laojiao">
+<meta property="og:description" content="4. C++ LRU cache 引入 为什么 AI 引擎需要 Cache？ 在深度学习编译框架（比如 TVM）中，编译一个特定的 GPU 算子（比如“128x128 的半精度矩阵乘法”）非常耗时。 为了加速，一旦某个算子被编译好，我们就想把它存进缓存里。下次碰到一样的算子，直接拿编译好的机器码就行。 问题来了：机器的内存是有限的（假设最多只能存 1000 个算子）。如果缓存满了，而又来了一个新算">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://laojiao1.github.io/img/algorithm/C++/LRU.png">
+<meta property="article:published_time" content="2026-08-10T01:12:41.486Z">
+<meta property="article:modified_time" content="2026-08-10T01:12:41.486Z">
+<meta property="article:author" content="Laojiao">
+<meta property="article:tag" content="C++">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://laojiao1.github.io/img/algorithm/C++/LRU.png">
+  
+  
+  
+  <title>LRU cache - Laojiao</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/KaTeX/0.16.2/katex.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1749284_5i9bdhy70f8.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/c/font_1736178_k526ubmyhba.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+  
+<link rel="stylesheet" href="/css/glassBg.css">
+<link rel="stylesheet" href="/css/about.css">
+<link rel="stylesheet" href="/css/sign.css">
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"laojiao1.github.io","root":"/","version":"1.9.8","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":"G-XVT7GF7B07"},"tencent":{"sid":null,"cid":null},"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":true},"umami":{"src":null,"website_id":null,"domains":null,"start_time":"2024-01-01T00:00:00.000Z","token":null,"api_server":null}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=G-XVT7GF7B07", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', 'G-XVT7GF7B07');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+<body><!-- hexo injector body_begin start --><div id="web_bg"></div><!-- hexo injector body_begin end -->
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>Laojiao&#39;s Blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>Home</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>Archive</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>Category</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>Tag</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>About</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/blog/Post.jpg') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="LRU cache"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-08-10 09:12" pubdate>
+          2026年8月10日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">LRU cache</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h1>4. C++ LRU cache</h1>
+<h2 id="引入">引入</h2>
+<h3 id="为什么-AI-引擎需要-Cache？">为什么 AI 引擎需要 Cache？</h3>
+<p>在深度学习编译框架（比如 TVM）中，编译一个特定的 GPU 算子（比如“128x128 的半精度矩阵乘法”）非常耗时。</p>
+<p>为了加速，一旦某个算子被编译好，我们就想把它存进缓存里。下次碰到一样的算子，直接拿编译好的机器码就行。</p>
+<p><strong>问题来了</strong>：机器的内存是有限的（假设最多只能存 1000 个算子）。如果缓存满了，而又来了一个新算子，<strong>我们该把谁踢出去？</strong></p>
+<p>最合理的逻辑是：把**“最近最少使用（Least Recently Used, LRU）”**的那个老算子踢掉，因为将来再用到它的概率最低。</p>
+<h3 id="单一数据结构的致命缺陷">单一数据结构的致命缺陷</h3>
+<p>如果让你来实现这个缓存，并且要求：<strong>查找数据、插入数据、剔除老数据，这三个操作的时间复杂度都必须是绝对的 O(1)</strong>，你会怎么选数据结构？</p>
+<ol>
+<li><strong>纯数组/队列（<code>std::vector</code> / <code>std::queue</code>）</strong>：
+<ul>
+<li>淘汰老数据很简单（踢掉尾部）。但查找一个算子在不在里面，必须从头遍历，时间复杂度是 O(N)！太慢了！</li>
+</ul>
+</li>
+<li><strong>纯哈希表（<code>std::unordered_map</code>）</strong>：
+<ul>
+<li>查找数据是神级的 O(1)！但是，哈希表内部是无序的，它根本<strong>没有“时间顺序”的概念</strong>。你根本不知道哪一条数据是很久以前放进去的。</li>
+</ul>
+</li>
+</ol>
+<h3 id="哈希表-双向链表">哈希表 + 双向链表</h3>
+<p>为了达到三个 O(1) 的苛刻要求，大神们把两种数据结构强行缝合在了一起：</p>
+<p><strong><code>std::unordered_map</code>（负责 O(1) 定位） + <code>std::list</code>（双向链表，负责 O(1) 维护时间顺序）</strong>。</p>
+<p>这是整个算法的核心：</p>
+<ol>
+<li><strong>双向链表</strong>：里面存着真正的数据包 <code>[Key, Value]</code>。
+<ul>
+<li><strong>规矩</strong>：谁只要被访问了（无论是刚存进去，还是被查阅了一次），谁就立刻被强行拉到<strong>链表的最头部（头部 = 最新）</strong></li>
+<li>那么随着时间流逝，<strong>链表的最尾部，自然就是那个“最近最少使用”的算子</strong>。一旦超载，直接把尾巴切掉，O(1) 搞定淘汰！</li>
+</ul>
+</li>
+<li><strong>哈希表</strong>：
+<ul>
+<li>Key 是算子的名字。</li>
+<li>Value <strong>不是真实的数据，而是指向双向链表里那个节点的指针（迭代器 <code>std::list::iterator</code>）</strong>！</li>
+<li>有了它，我们找数据时再也不用遍历链表了。哈希表 O(1) 瞬间告诉你该节点在链表里的精确位置；拿到位置后，链表 O(1) 瞬间把这个节点剪切、并粘到头部去更新时间。</li>
+</ul>
+</li>
+</ol>
+<p>这就是 LRU 的底层物理架构。</p>
+<h2 id="实战">实战</h2>
+<h3 id="代码">代码</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">pragma</span> once</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;unordered_map&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;list&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;utility&gt;</span></span><br><br><span class="hljs-keyword">namespace</span> ai_infra &#123;<br>    <br><span class="hljs-keyword">class</span> <span class="hljs-title class_">LRUCache</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-comment">// 缓存容量上限</span><br>    <span class="hljs-type">int</span> capacity_;<br>    <br>    <span class="hljs-comment">// 双向链表：用于维护数据访问的顺序，存放对组，以后可以通过对组中的Key去哈希表里直接对其进行操作</span><br>    std::list&lt;std::pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt; cache_list_;<br>    <br>    <span class="hljs-comment">// 哈希表：用于实现O(1)级别的快速查找</span><br>    <span class="hljs-comment">// Key 值存放双向链表中对应节点的迭代器，这样拿到迭代器之后就可以在O(1)d的时间内去直接操作链表中的节点</span><br>    std::unordered_map&lt; <span class="hljs-type">int</span>, <br>    	std::list&lt;std::pair&lt;<span class="hljs-type">int</span>, <span class="hljs-type">int</span>&gt;&gt;::iterator &gt; cache_map_;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-comment">// 构造函数，explicit 关键字防止隐式转换</span><br>	<span class="hljs-function"><span class="hljs-keyword">explicit</span> <span class="hljs-title">LRUCache</span><span class="hljs-params">(<span class="hljs-type">int</span> capacity)</span> : capacity_(capacity) &#123;</span>&#125;<br>    <br>    <span class="hljs-comment">// ------- 读取缓存 -------</span><br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">get</span><span class="hljs-params">(<span class="hljs-type">int</span> key)</span> </span>&#123;<br>        <span class="hljs-comment">// 在哈希表中查找key，看是否能命中</span><br>        <span class="hljs-keyword">auto</span> it = cache_map_.<span class="hljs-built_in">find</span>(key);<br>        <span class="hljs-comment">// 如果没命中，返回-1</span><br>        <span class="hljs-keyword">if</span>(it == cache_map_.<span class="hljs-built_in">end</span>()) &#123;<br>            <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>        &#125;<br>        <span class="hljs-comment">// 如果命中了，需要从哈希表中拿出对应节点的迭代器</span><br>        <span class="hljs-keyword">auto</span> node_it = it-&gt;second;<br>        <br>        <span class="hljs-comment">// 然后将该节点移动到链表的最头部，代表它刚刚被访问过</span><br>        <span class="hljs-comment">// 这里采用std::splice,它可以通过改变指针指向，在不破坏迭代器顺序的前提下，实现一系列操作 </span><br>        <span class="hljs-comment">// std::splice(目标位置，源链表，想要移动的节点)</span><br>        cache_list_.<span class="hljs-built_in">splice</span>(cache_list_.<span class="hljs-built_in">begin</span>(), cache_list_, node_it);<br>        <span class="hljs-comment">// 最后返回节点的 Value</span><br>        <span class="hljs-keyword">return</span> node_it-&gt;second;<br>    &#125;<br>    <br>    <span class="hljs-comment">// ------- 往队列中写入或者更新队列缓存 -------</span><br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">put</span><span class="hljs-params">(<span class="hljs-type">int</span> key, <span class="hljs-type">int</span> value)</span> </span>&#123;<br>        <span class="hljs-comment">// 先查找一下哈希表，看看这个 key 是否已经存在</span><br>        <span class="hljs-keyword">auto</span> it = cache_map_.<span class="hljs-built_in">find</span>(key);<br>        <br>        <span class="hljs-comment">// 如果存在的话，更新value，然后把该节点移动到头部即可</span><br>        <span class="hljs-keyword">if</span>(it != cache_map_.<span class="hljs-built_in">end</span>()) &#123;<br>            <span class="hljs-keyword">auto</span> node_it = it-&gt;second;<br>            node_it-&gt;second = value; <span class="hljs-comment">// 更新value</span><br>            cache_list_.<span class="hljs-built_in">splice</span>(cache_list_.<span class="hljs-built_in">begin</span>(), cache_list_, node_it); <span class="hljs-comment">// 移动到头部</span><br>            <span class="hljs-keyword">return</span>;<br>        &#125;<br>        <br>        <span class="hljs-comment">// 如果不存在，说明是新数据，需要插入</span><br>        <span class="hljs-comment">// 这里仍然采用 emplace_front，它是 push_front 的升级版，直接在链表头部分配好的内存块上，调用 pair 的构造函数原地生成对象。无需像 push_front 还得在外面打包成 pair，才拷贝到链表中</span><br>        cache_list_.<span class="hljs-built_in">emplace_front</span>(key, value);<br>        <span class="hljs-comment">// 在哈希表中添加一条记录，指向刚插入的头部节点</span><br>        cache_map_[key] = cache_list_.<span class="hljs-built_in">begin</span>();<br>        <br>        <span class="hljs-comment">// 最后还需要检查一下当前缓存数量是否超出了上限</span><br>        <span class="hljs-comment">// 如果超出上限，需要进行删除</span><br>        <span class="hljs-keyword">if</span>(cache_map_.<span class="hljs-built_in">size</span>() &gt; capacity_) &#123;<br>            <span class="hljs-comment">// 拿到尾部数据（最久未使用）</span><br>            <span class="hljs-keyword">auto</span> last_pair = cache_list_.<span class="hljs-built_in">back</span>();<br>            <span class="hljs-comment">// 删除哈希表里对应的记录</span><br>            cache_map_.<span class="hljs-built_in">erase</span>(last_pair.first);<br>            <span class="hljs-comment">// 记得把链表中的节点也删除</span><br>            cache_list_.<span class="hljs-built_in">pop_back</span>();<br>        &#125;<br>    &#125;<br>&#125;;<br>    <br>&#125; <span class="hljs-comment">// namespace ai_infra</span><br></code></pre></td></tr></table></figure>
+<h3 id="测试">测试</h3>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;iostream&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;04_lru_cache.hpp&quot;</span></span><br><br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> std;<br><span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> ai_infra;<br><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span> </span>&#123;<br>    cout &lt;&lt; <span class="hljs-string">&quot;------- 引擎启动：初始化容量为 2 的算子缓存 -------n&quot;</span>;<br>    <span class="hljs-function">LRUCache <span class="hljs-title">cache</span><span class="hljs-params">(<span class="hljs-number">2</span>)</span></span>;<br><br>    cout &lt;&lt; <span class="hljs-string">&quot;1. 编译算子 1 并塞入缓存...\n&quot;</span>;<br>    cache.<span class="hljs-built_in">put</span>(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>); <span class="hljs-comment">// 缓存是 &#123;1=100&#125;</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;2. 编译算子 2 并塞入缓存...\n&quot;</span>;<br>    cache.<span class="hljs-built_in">put</span>(<span class="hljs-number">2</span>, <span class="hljs-number">200</span>); <span class="hljs-comment">// 缓存是 &#123;2=200, 1=100&#125;，算子 2 在链表头部</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;3. 尝试获取算子 1: &quot;</span> &lt;&lt; cache.<span class="hljs-built_in">get</span>(<span class="hljs-number">1</span>) &lt;&lt; <span class="hljs-string">&quot; (预期: 100)\n&quot;</span>;<br>    <span class="hljs-comment">// 此时算子 1 被重新激活，跑到头部！缓存顺序变成 &#123;1=100, 2=200&#125;</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;4. 内存告急！强行塞入算子 3...\n&quot;</span>;<br>    cache.<span class="hljs-built_in">put</span>(<span class="hljs-number">3</span>, <span class="hljs-number">300</span>); <br>    <span class="hljs-comment">// 容量满了！尾部的算子 2 被无情淘汰。缓存变成 &#123;3=300, 1=100&#125;</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;5. 尝试获取被淘汰的算子 2: &quot;</span> &lt;&lt; cache.<span class="hljs-built_in">get</span>(<span class="hljs-number">2</span>) &lt;&lt; <span class="hljs-string">&quot; (预期: -1，代表 Cache Miss)\n&quot;</span>;<br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;6. 强行塞入算子 4...\n&quot;</span>;<br>    cache.<span class="hljs-built_in">put</span>(<span class="hljs-number">4</span>, <span class="hljs-number">400</span>);<br>    <span class="hljs-comment">// 尾部的算子 1 遭遇淘汰。缓存变成 &#123;4=400, 3=300&#125;</span><br>    <br>    cout &lt;&lt; <span class="hljs-string">&quot;7. 尝试获取算子 1: &quot;</span> &lt;&lt; cache.<span class="hljs-built_in">get</span>(<span class="hljs-number">1</span>) &lt;&lt; <span class="hljs-string">&quot; (预期: -1)\n&quot;</span>;<br>    cout &lt;&lt; <span class="hljs-string">&quot;8. 尝试获取算子 3: &quot;</span> &lt;&lt; cache.<span class="hljs-built_in">get</span>(<span class="hljs-number">3</span>) &lt;&lt; <span class="hljs-string">&quot; (预期: 300)\n&quot;</span>;<br>    cout &lt;&lt; <span class="hljs-string">&quot;9. 尝试获取算子 4: &quot;</span> &lt;&lt; cache.<span class="hljs-built_in">get</span>(<span class="hljs-number">4</span>) &lt;&lt; <span class="hljs-string">&quot; (预期: 400)\n&quot;</span>;<br><br>    cout &lt;&lt; <span class="hljs-string">&quot;------- 测试完毕，缓存驱逐逻辑完美生效！ -------n&quot;</span>;<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<h2 id="力扣实战">力扣实战</h2>
+<p>力扣 147 题，手写 LRU，要求打败 95% 以上的提交</p>
+<p>如果你直接使用上面的代码，那么最后的战绩会惨不忍睹</p>
+<p>所以我们需要做 “一” 点优化：</p>
+<ul>
+<li>
+<p>关闭 IO 同步，极限加速读写</p>
+</li>
+<li>
+<p>在初始化时，抛弃随用随建的做法，直接申请一块连续的内存池 <code>node_pool</code>，不现场 new</p>
+</li>
+<li>
+<p>根据题目条件，直接用数组 <code>hash_map[10005]</code> 模拟哈希表，避免 unordered_map 的哈希冲突和内存碎片化问题</p>
+</li>
+<li>
+<p>采用一个自己指向自己的 <code>dummy</code> 空节点，把直线型链表接成一个首尾相连的“循环双向链表”。这样<code>dummy-&gt;next</code> 永远都是最新的节点，<code>dummy-&gt;prev</code> 永远都是最旧的节点</p>
+</li>
+<li>
+<p>当缓存写满需要淘汰老数据时，不使用 <code>delete</code> 销毁旧节点，只需要直接摘下最尾部即将被淘汰的节点，擦除旧数据、换上新 Key 和 Value，然后重新挂到链表头部继续使用。</p>
+</li>
+<li>
+<p>不采用 <code>list</code> ，自己定义一个 <code>node</code> 结构体，直接手写静态双向链表</p>
+<ul>
+<li>底层逻辑：<code>std::list</code> 的每次 <code>emplace_front</code> 都会在堆（Heap）上调用操作系统的 <code>new</code> 申请内存。堆内存碎片化严重，导致节点散落在内存各处，CPU Cache 命中率惨不忍睹。</li>
+</ul>
+</li>
+<li>
+<p>在构造函数中抛弃高级语言的 <code>for</code> 循环，改用底层的 <code>memset</code> 清空哈希表数组；同时利用 IO 切断 C++ 流同步。</p>
+</li>
+</ul>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;cstring&gt;</span></span><br><br><span class="hljs-comment">// 1. 关闭 IO 同步，极限加速读写</span><br><span class="hljs-type">static</span> <span class="hljs-type">const</span> <span class="hljs-keyword">auto</span> _ = []() &#123;<br>    std::ios::<span class="hljs-built_in">sync_with_stdio</span>(<span class="hljs-literal">false</span>);<br>    std::cin.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>);<br>    std::cout.<span class="hljs-built_in">tie</span>(<span class="hljs-literal">nullptr</span>);<br>    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;();<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">LRUCache</span> &#123;<br><span class="hljs-keyword">private</span>:<br>    <span class="hljs-keyword">struct</span> <span class="hljs-title class_">Node</span> &#123;<br>        <span class="hljs-type">int</span> key, value;<br>        Node* prev;<br>        Node* next;<br>    &#125;;<br><br>    <span class="hljs-type">int</span> capacity_;<br>    <span class="hljs-type">int</span> size_;<br>    Node* dummy;            <span class="hljs-comment">// 优化 3：单节点闭环链表</span><br>    Node* hash_map[<span class="hljs-number">10005</span>];  <span class="hljs-comment">// 空间换时间，O(1) 哈希</span><br>    Node* node_pool;        <span class="hljs-comment">// 优化 1：连续内存池，榨干 CPU 缓存！</span><br><br>    <span class="hljs-comment">// 辅助函数：将节点插入到头部（dummy 的后面）</span><br>    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">addToHead</span><span class="hljs-params">(Node* node)</span> </span>&#123;<br>        node-&gt;next = dummy-&gt;next;<br>        node-&gt;prev = dummy;<br>        dummy-&gt;next-&gt;prev = node;<br>        dummy-&gt;next = node;<br>    &#125;<br><br>    <span class="hljs-comment">// 辅助函数：将已存在的节点移动到头部</span><br>    <span class="hljs-function"><span class="hljs-keyword">inline</span> <span class="hljs-type">void</span> <span class="hljs-title">moveToHead</span><span class="hljs-params">(Node* node)</span> </span>&#123;<br>        <span class="hljs-comment">// 先从原位置拔出来</span><br>        node-&gt;prev-&gt;next = node-&gt;next;<br>        node-&gt;next-&gt;prev = node-&gt;prev;<br>        <span class="hljs-comment">// 再插到头部</span><br>        <span class="hljs-built_in">addToHead</span>(node);<br>    &#125;<br><br><span class="hljs-keyword">public</span>:<br>    <span class="hljs-built_in">LRUCache</span>(<span class="hljs-type">int</span> capacity) : <span class="hljs-built_in">capacity_</span>(capacity), <span class="hljs-built_in">size_</span>(<span class="hljs-number">0</span>) &#123;<br>        <span class="hljs-comment">// 优化 2：底层指令级清空数组，碾压 for 循环</span><br>        <span class="hljs-built_in">memset</span>(hash_map, <span class="hljs-number">0</span>, <span class="hljs-built_in">sizeof</span>(hash_map));<br><br>        <span class="hljs-comment">// 优化 1 核心：一次性向系统批发连续内存！告别碎片化！</span><br>        node_pool = <span class="hljs-keyword">new</span> Node[capacity_]; <br><br>        <span class="hljs-comment">// 优化 3 核心：单节点闭环，自己连自己</span><br>        dummy = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Node</span>();<br>        dummy-&gt;next = dummy;<br>        dummy-&gt;prev = dummy;<br>    &#125;<br>    <br>    <span class="hljs-comment">// LeetCode 会测试内存泄漏，虽然竞赛不管，但为了完美还是加上析构</span><br>    ~<span class="hljs-built_in">LRUCache</span>() &#123;<br>        <span class="hljs-keyword">delete</span>[] node_pool;<br>        <span class="hljs-keyword">delete</span> dummy;<br>    &#125;<br>    <br>    <span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">get</span><span class="hljs-params">(<span class="hljs-type">int</span> key)</span> </span>&#123;<br>        Node* node = hash_map[key];<br>        <span class="hljs-keyword">if</span> (!node) <span class="hljs-keyword">return</span> <span class="hljs-number">-1</span>;<br>        <span class="hljs-built_in">moveToHead</span>(node);<br>        <span class="hljs-keyword">return</span> node-&gt;value;<br>    &#125;<br>    <br>    <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">put</span><span class="hljs-params">(<span class="hljs-type">int</span> key, <span class="hljs-type">int</span> value)</span> </span>&#123;<br>        Node* node = hash_map[key];<br>        <span class="hljs-keyword">if</span> (node) &#123;<br>            <span class="hljs-comment">// 节点存在，更新并前移</span><br>            node-&gt;value = value;<br>            <span class="hljs-built_in">moveToHead</span>(node);<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-comment">// 节点不存在，需要插入</span><br>            <span class="hljs-keyword">if</span> (size_ == capacity_) &#123;<br>                <span class="hljs-comment">// 容量满，借尸还魂，淘汰尾部（dummy 的前一个）</span><br>                Node* old_node = dummy-&gt;prev; <br>                <br>                hash_map[old_node-&gt;key] = <span class="hljs-literal">nullptr</span>; <br>                <br>                old_node-&gt;key = key;     <br>                old_node-&gt;value = value;<br>                <br>                hash_map[key] = old_node; <br>                <span class="hljs-built_in">moveToHead</span>(old_node);     <br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-comment">// 容量未满：绝对不 new！直接从连续内存池里按顺序拿一个出来用</span><br>                Node* newNode = &amp;node_pool[size_];<br>                newNode-&gt;key = key;<br>                newNode-&gt;value = value;<br>                <br>                hash_map[key] = newNode;<br>                <span class="hljs-built_in">addToHead</span>(newNode);<br>                size_++;<br>            &#125;<br>        &#125;<br>    &#125;<br>&#125;;<br></code></pre></td></tr></table></figure>
+<p>最终战绩：</p>
+<ul>
+<li>执行用时分布：37 ms 击败 99.86%</li>
+<li>消耗内存分布：168.78MB 击败 95.59%</li>
+</ul>
+<h2 id="面试题">面试题</h2>
+<h3 id="为什么-LRU-必须是“哈希表-双向链表”的组合？用单向链表或者数组不行吗？">为什么 LRU 必须是“哈希表 + 双向链表”的组合？用单向链表或者数组不行吗？</h3>
+<blockquote>
+<p><strong>底层动机</strong>：考察对数据结构时间复杂度的绝对掌控。</p>
+</blockquote>
+<p><strong>参考回答</strong>：</p>
+<ul>
+<li><strong>为什么不用数组？</strong> 数组虽然查找是 O(1)，但如果遇到数据淘汰（移出旧元素并移动后续元素）或者更新新鲜度（移到头部），时间复杂度会立刻暴增到 O(N)。</li>
+<li><strong>为什么不用单向链表？</strong> 在触发缓存命中时，我们需要把当前的节点从链表中间“抠出来”移动到头部。在单向链表中，要删除一个节点，<strong>必须知道它的前驱节点</strong>。如果不从头遍历，我们就找不到前驱节点，这让操作再次退化成 O(N)。</li>
+<li><strong>只有双向链表</strong>：自带 <code>prev</code> 和 <code>next</code> 指针，只要通过哈希表在 O(1) 内锁定了它的位置，就能在 O(1) 内完成它的剪切和插入。</li>
+</ul>
+<h3 id="在双向链表里，为什么节点必须存-std-pair-Key-Value-？只存-Value-会发生什么灾难？">在双向链表里，为什么节点必须存 <code>std::pair&lt;Key, Value&gt;</code>？只存 <code>Value</code> 会发生什么灾难？</h3>
+<blockquote>
+<p><strong>底层动机</strong>：考察数据结构闭环与反向追踪能力。这也是最多人死在白板手写阶段的一个坑。</p>
+</blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>存 Key 的唯一目的是为了应对**“驱逐残留（Eviction）”**。</p>
+<p>当缓存容量达到上限时，我们必须淘汰链表最尾部的节点。如果节点里只存了 <code>Value</code>，我们确实可以轻易地把这个尾部节点从链表里删掉。</p>
+<p><strong>但是，哈希表里还残留着指向这个节点的“幽灵记录”！</strong></p>
+<p>因为哈希表的删除函数 <code>erase()</code> 必须传入 <code>Key</code> 才能起效。如果链表节点里没有反向记录这个 <code>Key</code>，我们将永远无法清理哈希表，最终导致系统内存泄漏和逻辑彻底错乱。</p>
+<h3 id="在把命中节点移动到头部时，你用的是-std-list-splice，如果改成先-erase-删除节点，再-push-front-插入节点，会有什么隐患？">在把命中节点移动到头部时，你用的是 <code>std::list::splice</code>，如果改成先 <code>erase</code> 删除节点，再 <code>push_front</code> 插入节点，会有什么隐患？</h3>
+<blockquote>
+<p><strong>底层动机</strong>：考察对 C++ 内存分配开销和迭代器失效（Iterator Invalidation）的深刻认知。</p>
+</blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>有两个极大的隐患：</p>
+<ol>
+<li><strong>性能开销（致命）</strong>：<code>erase</code> 会触发节点对象的析构和堆内存回收，<code>push_front</code> 会触发底层 <code>new</code> 去重新申请堆内存。频繁的内存分配与释放是极高昂的系统调用开销。而 <code>splice</code> 仅仅是<strong>改变了几个指针的指向</strong>，真正的物理内存完全没动。</li>
+<li><strong>迭代器失效</strong>：如果用 <code>erase</code>，原来存在哈希表中的那个迭代器就<strong>瞬间失效（变为了悬垂指针）</strong>，后续再访问必死无疑。而 <code>splice</code> 保证了被移动的节点，其迭代器永远有效，无需同步更新哈希表。</li>
+</ol>
+<h3 id="你手写的这个-LRU-Cache-是线程安全的吗？如果不安全，在深度学习框架的多线程环境下该怎么改造？">你手写的这个 LRU Cache 是线程安全的吗？如果不安全，在深度学习框架的多线程环境下该怎么改造？</h3>
+<blockquote>
+<p><strong>底层动机</strong>：将 LRU 与上一节课的 Thread Pool 进行系统级联动。</p>
+</blockquote>
+<p><strong>参考回答</strong>：</p>
+<p>**绝对不安全。**标准库的 <code>std::list</code> 和 <code>std::unordered_map</code> 都不具备并发保护。</p>
+<p>如果将其应用在多线程高并发的算子调度中，多个线程同时读写哈希表会导致严重的 Data Race，甚至使红黑树/哈希桶结构彻底撕裂。</p>
+<p><strong>改造方案</strong>：最简单的方案是在类内部加一把全局 <code>std::mutex</code>，在 <code>get</code> 和 <code>put</code> 的最开头上锁。</p>
+<p>但在工业级（如 Redis 底层或 AI 引擎）缓存中，由于“读操作（Get）”远多于“写操作（Put）”，全局锁会成为巨大瓶颈。应当采用 <strong><code>std::shared_mutex</code>（读写锁）</strong>，或者采用**分段锁（Segmented Lock）**将哈希表拆分成多个桶，以此将并发粒度降到最低。</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/C/" class="category-chain-item">C++</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/C/" class="print-no-link">#C++</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>LRU cache</div>
+      <div>https://laojiao1.github.io/2026/08/10/Compiler/C++/4. C++ LRU cache/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>Laojiao</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年8月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-cc-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2026/07/09/Compiler/C++/3.%20C++%20%E9%AB%98%E5%B9%B6%E5%8F%91%E4%B8%8E%E7%BA%BF%E7%A8%8B%E6%B1%A0/" title="C++ shared_ptr">
+                        <span class="hidden-mobile">C++ shared_ptr</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+  
+  
+
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/5.0.0/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/sign.js"></script>
+<script src="/js/diy/snow.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+  <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+  <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+  <!-- 页面点击烟花 -->
+  <!-- <script type="text/javascript" src="/js/diy/fireworks.js"></script> -->
+  <!-- 页面点击小红心 -->
+  <script type="text/javascript" src="/js/diy/love.js"></script>
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+<!-- hexo injector body_end start --><script src="/js/backgroundize.js"></script><!-- hexo injector body_end end --></body>
+</html>
