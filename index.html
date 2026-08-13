@@ -258,6 +258,75 @@
     
     
       <div class="col-12 col-md-4 m-auto index-img">
+        <a href="/2026/08/13/Compiler/Triton/LayerNorm%20Triton%20%E5%AE%9E%E7%8E%B0/" target="_self">
+          <img src="/img/algorithm/C++/Triton.png" srcset="/img/loading.gif" lazyload alt="LayerNorm Triton">
+        </a>
+      </div>
+    
+    <article class="col-12 col-md-8 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/08/13/Compiler/Triton/LayerNorm%20Triton%20%E5%AE%9E%E7%8E%B0/" target="_self">
+          LayerNorm Triton
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt " href="/2026/08/13/Compiler/Triton/LayerNorm%20Triton%20%E5%AE%9E%E7%8E%B0/" target="_self">
+        <div>
+          LayerNorm Triton 实现 LayerNorm（层归一化）的前向传播确实直观，但它的 反向传播（Backward Pass）推导 则是 CUDA/Triton 算子优化中最精妙、也最考验物理直觉的经典环节之一。 下面我将先简单介绍其数学思想，并采用两种数学推导的方式讲解反向传播，最后与 Triton 官方示例代码进行映射并总结。 数学思想：LayerNorm 到底在干什么？ 假设输入为
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-08-13 18:24" pubdate>
+              2026-08-13
+            </time>
+          </div>
+        
+        
+          <div class="post-meta mr-3 d-flex align-items-center">
+            <i class="iconfont icon-category"></i>
+            
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Triton/" class="category-chain-item">Triton</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+          </div>
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/Triton/">#Triton</a>
+            
+              <a href="/tags/Compiler/">#Compiler</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+      <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2026/08/10/Compiler/C++/4.%20C++%20LRU%20cache/" target="_self">
           <img src="/img/algorithm/C++/LRU.png" srcset="/img/loading.gif" lazyload alt="LRU cache">
         </a>
@@ -393,7 +462,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2026/07/08/Compiler/C++/2.%20C++%20shared_ptr/" target="_self">
-          <img src="/img/algorithm/C++/image.png" srcset="/img/loading.gif" lazyload alt="C++ shared_ptr">
+          <img src="/img/algorithm/C++/C++.png" srcset="/img/loading.gif" lazyload alt="C++ shared_ptr">
         </a>
       </div>
     
@@ -460,7 +529,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2026/07/07/Compiler/C++/1.%20C++%20unique_ptr/" target="_self">
-          <img src="/img/algorithm/C++/image.png" srcset="/img/loading.gif" lazyload alt="C++ unique_ptr">
+          <img src="/img/algorithm/C++/C++.png" srcset="/img/loading.gif" lazyload alt="C++ unique_ptr">
         </a>
       </div>
     
@@ -527,7 +596,7 @@
     
       <div class="col-12 col-md-4 m-auto index-img">
         <a href="/2026/07/04/Compiler/C++/0.%20C++%20%E6%8C%87%E9%92%88%E7%B2%BE%E8%AE%B2/" target="_self">
-          <img src="/img/algorithm/C++/image.png" srcset="/img/loading.gif" lazyload alt="C++ 指针精讲">
+          <img src="/img/algorithm/C++/C++.png" srcset="/img/loading.gif" lazyload alt="C++ 指针精讲">
         </a>
       </div>
     
@@ -828,77 +897,6 @@
             <i class="iconfont icon-date"></i>
             <time datetime="2026-06-03 19:13" pubdate>
               2026-06-03
-            </time>
-          </div>
-        
-        
-          <div class="post-meta mr-3 d-flex align-items-center">
-            <i class="iconfont icon-category"></i>
-            
-
-<span class="category-chains">
-  
-  
-    
-      <span class="category-chain">
-        
-  <a href="/categories/DeepLearning/" class="category-chain-item">DeepLearning</a>
-  
-  
-
-      </span>
-    
-  
-</span>
-
-          </div>
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/%E9%87%8F%E5%8C%96/">#量化</a>
-            
-              <a href="/tags/%E7%BC%96%E8%AF%91%E5%99%A8/">#编译器</a>
-            
-              <a href="/tags/%E8%BD%AF%E7%A1%AC%E7%BB%93%E5%90%88/">#软硬结合</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-      <div class="col-12 col-md-4 m-auto index-img">
-        <a href="/2026/06/01/Compiler/Quantification/Quantification5/" target="_self">
-          <img src="/img/DeepLearning/Quantization/image.png" srcset="/img/loading.gif" lazyload alt="神经网络量化 —— 完整的神经网络量化实战">
-        </a>
-      </div>
-    
-    <article class="col-12 col-md-8 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/06/01/Compiler/Quantification/Quantification5/" target="_self">
-          神经网络量化 —— 完整的神经网络量化实战
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt " href="/2026/06/01/Compiler/Quantification/Quantification5/" target="_self">
-        <div>
-          神经网络量化 —— 完整的神经网络量化实战 回顾 在上节内容中，我们通过手动“拍脑门”假设了一组黄金 Scale 和 Zero-Point，硬编码完成了带 Q/DQ 节点的 ONNX 模型导出实战。虽然在 Netron 里看到了完美的整数仿真链条，但这种脱离实际数据分布的“盲猜”在真正的工程落地中无异于天方夜谭。 还记得我们之前在《2.1 神经网络量化入门》里跑过的那个极简的神经网络吗？ 当时的结
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-06-01 09:12" pubdate>
-              2026-06-01
             </time>
           </div>
         
